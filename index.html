@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Math Visualizer</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f6fa;
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:20px;
+}
+
+select,button{
+    padding:12px;
+    margin:5px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#eee;
+}
+
+.visual-buttons{
+    margin-top:20px;
+}
+
+#canvasBox{
+    margin-top:30px;
+    min-height:300px;
+    padding:20px;
+    border:2px dashed #ddd;
+}
+
+
+/* 나무 */
+.tree{
+    text-align:center;
+    font-size:22px;
+}
+
+.node{
+    display:inline-block;
+    padding:10px 20px;
+    background:#dff6dd;
+    border-radius:20px;
+    margin:10px;
+}
+
+.line{
+    height:30px;
+}
+
+
+/* 저울 */
+.balance{
+    font-size:40px;
+    text-align:center;
+}
+
+
+/* 수직선 */
+.numberline{
+    margin-top:80px;
+    height:5px;
+    background:black;
+    position:relative;
+}
+
+.point{
+    position:absolute;
+    top:-15px;
+    width:20px;
+    height:20px;
+    background:red;
+    border-radius:50%;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+<h1>수학 개념 시각화</h1>
+
+
+<h3>개념 선택</h3>
+
+<select id="concept">
+
+<option value="">선택</option>
+
+<option value="prime">
+소인수분해
+</option>
+
+<option value="equation">
+일차방정식
+</option>
+
+<option value="number">
+제곱근
+</option>
+
+<option value="function">
+일차함수
+</option>
+
+</select>
+
+
+
+<div class="visual-buttons" id="buttons"></div>
+
+
+<div id="canvasBox">
+
+선택한 시각화가 여기에 표시됩니다.
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+const data={
+
+prime:{
+name:"소인수분해",
+visual:[
+["tree","🌳 나무"]
+]
+},
+
+
+equation:{
+name:"일차방정식",
+visual:[
+["balance","⚖ 저울"],
+["graph","📈 그래프"]
+]
+},
+
+
+number:{
+name:"제곱근",
+visual:[
+["numberline","📏 수직선"]
+]
+},
+
+
+function:{
+name:"일차함수",
+visual:[
+["graph","📈 그래프"]
+]
+}
+
+};
+
+
+
+const concept=document.getElementById("concept");
+const buttons=document.getElementById("buttons");
+const box=document.getElementById("canvasBox");
+
+
+concept.onchange=()=>{
+
+
+buttons.innerHTML="";
+
+let item=data[concept.value];
+
+if(!item)return;
+
+
+item.visual.forEach(v=>{
+
+let btn=document.createElement("button");
+
+btn.innerText=v[1];
+
+btn.onclick=()=>draw(v[0]);
+
+buttons.appendChild(btn);
+
+
+});
+
+
+};
+
+
+
+function draw(type){
+
+
+box.innerHTML="";
+
+
+if(type==="tree"){
+
+
+box.innerHTML=`
+
+<div class="tree">
+
+<div class="node">24</div>
+
+<div class="line">
+↓
+</div>
+
+<div>
+
+<span class="node">4</span>
+<span class="node">6</span>
+
+</div>
+
+<div class="line">
+↓
+</div>
+
+
+<div>
+
+<span class="node">2</span>
+<span class="node">2</span>
+<span class="node">2</span>
+<span class="node">3</span>
+
+</div>
+
+
+<h3>
+24 = 2³ × 3
+</h3>
+
+
+</div>
+
+`;
+
+}
+
+
+
+if(type==="balance"){
+
+
+box.innerHTML=`
+
+<div class="balance">
+
+⚖️
+
+<br>
+
+x + 3 = 7
+
+<br><br>
+
+양쪽에서 3 제거
+
+<br>
+
+x = 4
+
+</div>
+
+`;
+
+}
+
+
+
+if(type==="numberline"){
+
+
+box.innerHTML=`
+
+<h2>√2 ≈ 1.414</h2>
+
+<div class="numberline">
+
+<div class="point"
+style="left:45%">
+</div>
+
+</div>
+
+`;
+
+}
+
+
+
+if(type==="graph"){
+
+
+box.innerHTML=`
+
+<canvas id="chart"></canvas>
+
+`;
+
+
+new Chart(
+document.getElementById("chart"),
+{
+
+type:"line",
+
+data:{
+
+labels:[
+-3,-2,-1,0,1,2,3
+],
+
+datasets:[{
+
+label:"y=x²",
+
+data:[
+9,4,1,0,1,4,9
+]
+
+}]
+
+},
+
+options:{
+responsive:true
+}
+
+}
+
+);
+
+
+}
+
+
+}
+
+
+</script>
+
+
+</body>
+</html>
