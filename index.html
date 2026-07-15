@@ -13,35 +13,87 @@
 ※ 입력 규칙<br>
 - xx = x²<br>
 - xxx = x³<br>
-- xxxx = x⁴
 </p>
 
 <input id="graphInput" value="y=xx">
 <button onclick="drawGraph()">그리기</button>
 
-<br><br>
+<p id="coord">(x, y)</p>
 
 <svg id="graphSVG" width="600" height="400" style="border:1px solid #ccc;"></svg>
 
 <script>
 
+const svg = document.getElementById("graphSVG");
+
+const W = 600;
+const H = 400;
+const scale = 30;
+
+
+// ===== 마우스 좌표 표시 =====
+svg.addEventListener("mousemove", function(e){
+
+    const rect = svg.getBoundingClientRect();
+
+    let mx = e.clientX - rect.left;
+    let my = e.clientY - rect.top;
+
+    let x = (mx - W/2) / scale;
+    let y = (H/2 - my) / scale;
+
+    document.getElementById("coord").innerText =
+        `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+});
+
+
+
+
+// ===== 눈금 =====
+function drawGrid(){
+
+    let grid = "";
+
+    for(let i=-10;i<=10;i++){
+
+        let x = W/2 + i*scale;
+        let y = H/2 - i*scale;
+
+        // 세로선
+        grid += `<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="#ddd"/>`;
+
+        // 가로선
+        grid += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#ddd"/>`;
+
+        // 숫자
+        if(i !== 0){
+
+            grid += `<text x="${x+2}" y="${H/2+12}" font-size="10">${i}</text>`;
+            grid += `<text x="${W/2+5}" y="${y-2}" font-size="10">${i}</text>`;
+        }
+    }
+
+    // 축
+    grid += `
+    <line x1="${W/2}" y1="0" x2="${W/2}" y2="${H}" stroke="black"/>
+    <line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="black"/>
+    `;
+
+    return grid;
+}
+
+
+
+
 function drawGraph(){
 
-    const svg = document.getElementById("graphSVG");
-    svg.innerHTML = "";
-
-    const W = 600;
-    const H = 400;
-    const scale = 30;
+    svg.innerHTML = drawGrid();
 
     let input = document.getElementById("graphInput").value;
 
-    // ===== x 거듭제곱 처리 =====
     let expr = input.replace("y=","");
 
-    expr = expr.replace(/x{2,}/g, (match)=>{
-        return match.split("").join("*");
-    });
+    expr = expr.replace(/x{2,}/g, (m)=>m.split("").join("*"));
 
     let f;
 
@@ -52,35 +104,42 @@ function drawGraph(){
         return;
     }
 
-    // ===== 축 =====
-    svg.innerHTML += `
-    <line x1="${W/2}" y1="0" x2="${W/2}" y2="${H}" stroke="black"/>
-    <line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="black"/>
-    `;
-
-    // ===== 그래프 선 =====
+    // ===== 애니메이션 =====
+    let x = -10;
     let points = "";
 
-    for(let x=-10; x<=10; x+=0.05){
+    function animate(){
 
-        let y = f(x);
+        for(let i=0;i<5;i++){
 
-        if(!isFinite(y)) continue;
+            if(x > 10) return;
 
-        let sx = W/2 + x*scale;
-        let sy = H/2 - y*scale;
+            let y = f(x);
 
-        points += `${sx},${sy} `;
+            if(isFinite(y)){
+
+                let sx = W/2 + x*scale;
+                let sy = H/2 - y*scale;
+
+                points += `${sx},${sy} `;
+            }
+
+            x += 0.05;
+        }
+
+        svg.innerHTML = drawGrid() + `
+        <polyline
+        points="${points}"
+        stroke="red"
+        fill="none"
+        stroke-width="2"
+        />
+        `;
+
+        requestAnimationFrame(animate);
     }
 
-    svg.innerHTML += `
-    <polyline
-    points="${points}"
-    stroke="red"
-    fill="none"
-    stroke-width="2"
-    />
-    `;
+    animate();
 
     // ===== 점 3개 =====
     let xs = [-5, 0, 5];
@@ -95,9 +154,6 @@ function drawGraph(){
 
         svg.innerHTML += `
         <circle cx="${sx}" cy="${sy}" r="4" fill="blue"/>
-        <text x="${sx+5}" y="${sy-5}" font-size="10">
-        (${x}, ${y.toFixed(1)})
-        </text>
         `;
     });
 
@@ -129,7 +185,13 @@ function drawGraph(){
     }
 }
 
-// 처음 실행
+
+// 엔터 실행
+document.getElementById("graphInput")
+.addEventListener("keydown", function(e){
+    if(e.key === "Enter") drawGraph();
+});
+
 drawGraph();
 
 </script>
