@@ -2,104 +2,153 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>방정식 저울</title>
+<title>수학 개념 시각화</title>
 
 <style>
+
 body{
     font-family:Arial;
-    background:#f5f5f5;
+    background:#f3f6fb;
     padding:30px;
 }
 
 .box{
-    background:white;
-    max-width:800px;
+    max-width:900px;
     margin:auto;
+    background:white;
     padding:30px;
-    border-radius:20px;
+    border-radius:25px;
     text-align:center;
+    box-shadow:0 10px 30px #ddd;
 }
 
 
-input,button{
-    padding:10px;
+input,button,select{
+    padding:12px;
     font-size:18px;
     margin:5px;
+    border-radius:10px;
+}
+
+
+button{
+    cursor:pointer;
+    background:#4b7bec;
+    color:white;
+    border:0;
 }
 
 
 .balance{
+
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:50px;
-    margin:40px;
+    gap:40px;
+    margin:50px;
+
 }
 
 
 .side{
-    width:220px;
-    min-height:100px;
-    border:4px solid #555;
-    border-radius:15px;
+
+    width:260px;
+    min-height:150px;
+    border:5px solid #555;
+    border-radius:20px;
+
     display:flex;
+    flex-direction:column;
     justify-content:center;
     align-items:center;
+
     font-size:35px;
+
     background:#fafafa;
+
 }
 
 
 .equal{
-    font-size:50px;
+
+    font-size:60px;
+
 }
 
 
-.result{
-    font-size:30px;
-    margin-top:30px;
+.block{
+
+    display:inline-block;
+    background:#4b7bec;
+    color:white;
+
+    padding:5px 10px;
+    margin:3px;
+
+    border-radius:8px;
+
 }
 
 
-.remove{
-    animation:fade .5s;
+.fade{
+
+animation:fade .8s;
+
 }
 
 
 @keyframes fade{
-    from{
-        opacity:1;
-        transform:translateY(0);
-    }
-    to{
-        opacity:0;
-        transform:translateY(-30px);
-    }
+
+0%{
+opacity:1;
+transform:translateY(0);
 }
+
+100%{
+opacity:0;
+transform:translateY(-40px);
+}
+
+}
+
+
+.info{
+
+font-size:25px;
+margin-top:30px;
+
+}
+
 
 </style>
 
 </head>
+
 
 <body>
 
 
 <div class="box">
 
-<h1>⚖ 방정식 저울</h1>
+
+<h1>⚖ 수학 개념 시각화</h1>
 
 
-<p>
-현재 식
-</p>
+<input id="equation"
+value="x+3=7"
+placeholder="식 입력">
+
+
+<button onclick="create()">
+생성
+</button>
+
 
 
 <div class="balance">
 
 
-<div class="side" id="left">
-x + 3
-</div>
+<div class="side" id="left"></div>
 
 
 <div class="equal">
@@ -107,9 +156,7 @@ x + 3
 </div>
 
 
-<div class="side" id="right">
-7
-</div>
+<div class="side" id="right"></div>
 
 
 </div>
@@ -118,66 +165,224 @@ x + 3
 
 <div>
 
-양쪽에서 제거할 숫자
+제거할 값
 
-<input id="remove" type="number" value="3">
+<input id="remove"
+type="number"
+value="3">
 
 
-<button onclick="removeNumber()">
-제거
+<button onclick="removeValue()">
+양쪽에서 제거
 </button>
 
 </div>
 
 
-<div class="result" id="result">
 
-x + 3 = 7
+<div class="info" id="info">
+
+</div>
+
 
 </div>
 
 
-</div>
 
 
 
 <script>
 
 
-let leftNumber=3;
-let rightNumber=7;
-let removed=false;
+let data={};
 
 
-function draw(){
+function parseEquation(eq){
 
-if(!removed){
 
-document.getElementById("left").innerHTML=
-`
-x + ${leftNumber}
+eq=eq.replace(/\s/g,"");
+
+
+let split=eq.split("=");
+
+
+if(split.length!==2)
+return null;
+
+
+
+let left=split[0];
+let right=Number(split[1]);
+
+
+
+let match=left.match(
+/x([+-]\d+)/
+);
+
+
+if(match){
+
+
+return {
+
+x:true,
+number:Number(match[1]),
+answer:right-Number(match[1])
+
+};
+
+
+}
+
+
+
+if(left==="x"){
+
+
+return{
+
+x:true,
+number:0,
+answer:right
+
+};
+
+}
+
+
+
+return null;
+
+
+}
+
+
+
+
+function blocks(n){
+
+
+let html="";
+
+
+for(let i=0;i<n;i++){
+
+html+=`
+<span class="block">■</span>
 `;
 
-document.getElementById("right").innerHTML=
-rightNumber;
+}
+
+
+return html;
+
+
+}
+
+
+
+
+function create(){
+
+
+let eq=
+document.getElementById("equation").value;
+
+
+
+let result=parseEquation(eq);
+
+
+if(!result){
+
+alert("현재는 x+숫자=숫자 형태만 지원합니다.");
+return;
+
+}
+
+
+
+data=result;
+
+
+
+draw(false);
+
+
+document.getElementById("info").innerHTML=
+`
+현재 개념 : 일차방정식<br>
+양쪽 균형을 유지하면서 같은 수를 제거합니다.
+`;
+
+
+
+}
+
+
+
+
+function draw(remove=false){
+
+
+
+let left=document.getElementById("left");
+let right=document.getElementById("right");
+
+
+
+if(remove){
+
+
+left.innerHTML=
+`
+<div class="fade">
+x + ${data.number}
+</div>
+`;
+
+right.innerHTML=
+`
+<div class="fade">
+${data.number}
+</div>
+`;
+
 
 
 }else{
 
-document.getElementById("left").innerHTML=
-"x";
+
+left.innerHTML=
+`
+x ${data.number>0?"+ "+data.number:""}
+<br>
+${blocks(data.number)}
+`;
 
 
-document.getElementById("right").innerHTML=
-rightNumber-leftNumber;
+
+right.innerHTML=
+`
+${data.answer+data.number}
+<br>
+${blocks(data.answer+data.number)}
+`;
+
 
 }
 
+
+
 }
 
 
 
-function removeNumber(){
+
+function removeValue(){
+
+
 
 let value=
 Number(
@@ -185,59 +390,54 @@ document.getElementById("remove").value
 );
 
 
-if(value!==leftNumber){
 
-alert("현재 추가된 숫자와 같은 값을 제거해야 합니다.");
+if(value!==data.number){
+
+alert("x 옆 숫자와 같은 값을 제거해야 합니다.");
 return;
 
 }
 
 
-if(removed)return;
 
-
-document.getElementById("left")
-.classList.add("remove");
-
-
-document.getElementById("right")
-.classList.add("remove");
+draw(true);
 
 
 
 setTimeout(()=>{
 
 
-removed=true;
+document.getElementById("left").innerHTML=
+"x";
 
 
-document.getElementById("left")
-.classList.remove("remove");
-
-
-document.getElementById("right")
-.classList.remove("remove");
-
-
-
-draw();
-
-
-
-document.getElementById("result")
-.innerHTML=
+document.getElementById("right").innerHTML=
 `
-x = ${rightNumber-leftNumber}
+${data.answer}
+<br>
+${blocks(data.answer)}
 `;
 
-},500);
+
+
+document.getElementById("info").innerHTML=
+`
+양쪽에서 ${value}을(를) 제거했습니다.<br>
+결과 : x = ${data.answer}
+`;
+
+
+
+},800);
 
 
 
 }
 
 
-draw();
+
+
+create();
 
 
 </script>
