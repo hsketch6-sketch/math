@@ -444,3 +444,572 @@ height="500">
 
 
 </div>
+<script>
+
+
+// ---------------------------
+// 개념 전환
+// ---------------------------
+
+function show(type){
+
+    document.getElementById("balance").classList.add("hidden");
+    document.getElementById("graph").classList.add("hidden");
+
+
+    document.getElementById(type).classList.remove("hidden");
+
+}
+
+
+
+// ---------------------------
+// ⚖ 방정식 저울
+// ---------------------------
+
+
+let equation={
+
+    leftNumber:3,
+    rightNumber:7
+
+};
+
+
+
+function makeBlocks(n){
+
+
+    if(n<=20){
+
+        let result="";
+
+
+        for(let i=0;i<n;i++){
+
+            result+=`
+            <span class="block">■</span>
+            `;
+
+        }
+
+
+        return result;
+
+    }
+
+
+
+    let ten=Math.floor(n/10);
+    let rest=n%10;
+
+
+    let result="";
+
+
+    for(let i=0;i<ten;i++){
+
+        result+=`
+        <span class="block">📦10</span>
+        `;
+
+    }
+
+
+    for(let i=0;i<rest;i++){
+
+        result+=`
+        <span class="block">■</span>
+        `;
+
+    }
+
+
+    return result;
+
+}
+
+
+
+
+function parseEquation(text){
+
+
+    text=text.replace(/\s/g,"");
+
+
+    let split=text.split("=");
+
+
+    if(split.length!==2)
+        return null;
+
+
+
+    let right=Number(split[1]);
+
+
+
+    let match=
+    split[0].match(/x([+-]\d+)/);
+
+
+
+    if(match){
+
+        return {
+
+            leftNumber:Number(match[1]),
+            rightNumber:right
+
+        };
+
+    }
+
+
+
+    if(split[0]=="x"){
+
+        return {
+
+            leftNumber:0,
+            rightNumber:right
+
+        };
+
+    }
+
+
+
+    return null;
+
+
+}
+
+
+
+
+function loadEquation(){
+
+
+    let result=
+    parseEquation(
+        document.getElementById("eq").value
+    );
+
+
+
+    if(!result){
+
+        alert("현재 x+숫자=숫자 형태만 지원합니다.");
+
+        return;
+
+    }
+
+
+    equation=result;
+
+
+    drawBalance();
+
+
+}
+
+
+
+
+
+function drawBalance(){
+
+
+    let left=
+    document.getElementById("left");
+
+
+    let right=
+    document.getElementById("right");
+
+
+
+    if(equation.leftNumber===0){
+
+
+        left.innerHTML="x";
+
+
+    }else{
+
+
+        left.innerHTML=
+
+        `
+        x + ${equation.leftNumber}
+
+        <br>
+
+        ${makeBlocks(equation.leftNumber)}
+
+        `;
+
+    }
+
+
+
+
+    right.innerHTML=
+
+    `
+    ${equation.rightNumber}
+
+    <br>
+
+    ${makeBlocks(equation.rightNumber)}
+
+    `;
+
+
+}
+
+
+
+
+function operation(type){
+
+
+    let value=
+    Number(
+        document.getElementById("num").value
+    );
+
+
+
+    let change=value*type;
+
+
+
+    let left=
+    document.getElementById("left");
+
+
+    let right=
+    document.getElementById("right");
+
+
+
+    left.classList.add("move");
+
+    right.classList.add("move");
+
+
+
+    setTimeout(()=>{
+
+
+        left.classList.remove("move");
+
+        right.classList.remove("move");
+
+
+
+        equation.leftNumber+=change;
+
+        equation.rightNumber+=change;
+
+
+
+        drawBalance();
+
+
+
+        document.getElementById("balanceInfo").innerHTML=
+
+        `
+        양변에 ${change} 적용
+
+        <br><br>
+
+        현재:
+        x ${equation.leftNumber>=0?"+":""}${equation.leftNumber}
+        =
+        ${equation.rightNumber}
+
+        <br><br>
+
+        정리하면:
+
+        <br>
+
+        x = ${equation.rightNumber-equation.leftNumber}
+
+        `;
+
+
+
+    },800);
+
+
+}
+
+
+
+
+
+
+
+// ---------------------------
+// 📈 함수 그래프
+// ---------------------------
+
+
+function parseFunction(text){
+
+
+    text=text.replace(/\s/g,"");
+
+
+    let exp=text.replace("y=","");
+
+
+
+    let match=
+    exp.match(/(-?\d*)x([+-]\d+)?/);
+
+
+
+    if(!match)
+        return null;
+
+
+
+    let a=match[1];
+
+
+    if(a==""||a=="+")
+        a=1;
+
+
+    if(a=="-")
+        a=-1;
+
+
+
+    return {
+
+        a:Number(a),
+
+        b:Number(match[2]||0)
+
+    };
+
+
+}
+
+
+
+
+
+function drawGraph(){
+
+
+    let svg=
+    document.getElementById("svgGraph");
+
+
+    svg.innerHTML="";
+
+
+
+    let f=
+    parseFunction(
+        document.getElementById("func").value
+    );
+
+
+
+    if(!f){
+
+        alert("현재 y=ax+b 형태만 지원합니다.");
+
+        return;
+
+    }
+
+
+
+
+    let W=700;
+
+    let H=500;
+
+    let scale=40;
+
+
+
+    // 축
+
+
+    svg.innerHTML+=`
+
+    <line x1="${W/2}" y1="0"
+    x2="${W/2}" y2="${H}"
+    stroke="black"/>
+
+
+    <line x1="0" y1="${H/2}"
+    x2="${W}" y2="${H/2}"
+    stroke="black"/>
+
+    `;
+
+
+
+    // 숫자 표시
+
+
+    for(let i=-8;i<=8;i++){
+
+
+        let x=W/2+i*scale;
+
+
+        svg.innerHTML+=`
+
+        <text x="${x}"
+        y="${H/2+20}"
+        font-size="14">
+
+        ${i}
+
+        </text>
+
+        `;
+
+    }
+
+
+
+
+
+    let points="";
+
+
+
+    for(let x=-8;x<=8;x+=0.1){
+
+
+        let y=f.a*x+f.b;
+
+
+
+        let sx=W/2+x*scale;
+
+        let sy=H/2-y*scale;
+
+
+
+        points+=`${sx},${sy} `;
+
+
+    }
+
+
+
+
+    svg.innerHTML+=`
+
+    <polyline
+
+    points="${points}"
+
+    fill="none"
+
+    class="line"
+
+    />
+
+    `;
+
+
+
+
+    // 점
+
+
+    for(let x=-5;x<=5;x++){
+
+
+        let y=f.a*x+f.b;
+
+
+        let sx=W/2+x*scale;
+
+        let sy=H/2-y*scale;
+
+
+
+        svg.innerHTML+=`
+
+        <circle
+
+        cx="${sx}"
+
+        cy="${sy}"
+
+        r="5"
+
+        class="point"
+
+        />
+
+        `;
+
+
+    }
+
+
+
+
+
+    document.getElementById("graphInfo").innerHTML=
+
+    `
+
+    함수:
+
+    y=${f.a}x ${f.b>=0?"+":""}${f.b}
+
+    <br>
+
+    기울기:
+
+    ${f.a}
+
+    <br>
+
+    y절편:
+
+    ${f.b}
+
+    `;
+
+
+
+}
+
+
+
+
+// 시작
+
+drawBalance();
+
+drawGraph();
+
+
+</script>
+
+
+</body>
+
+</html>
