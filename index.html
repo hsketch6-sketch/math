@@ -10,12 +10,20 @@ body { font-family: sans-serif; }
 #left { width:70%; }
 #right { width:30%; padding:10px; background:#f5f5f5; }
 
-canvas { border:1px solid black; }
+canvas { border:1px solid black; cursor:crosshair; }
 
 .graphItem {
     background:#eee;
     margin:5px;
     padding:5px;
+}
+
+#info {
+    margin-top:10px;
+    padding:10px;
+    background:#222;
+    color:#0f0;
+    min-height:50px;
 }
 </style>
 </head>
@@ -24,19 +32,25 @@ canvas { border:1px solid black; }
 <div id="top">
 <div id="left">
 <h2>📈 그래프 계산기</h2>
+
 <input id="input" placeholder="y=2x+1">
 <button onclick="addGraph()">추가</button>
+
 <canvas id="canvas" width="800" height="500"></canvas>
+
+<div id="info">👉 그래프 클릭하면 좌표 & 설명 표시됨</div>
 
 <h3>📊 그래프 목록</h3>
 <div id="list"></div>
+
 </div>
 
 <div id="right">
 <h3>📘 사용법</h3>
 <pre>
-xx = x^2
 ^ 사용 가능
+xx = x^2
+xxx = x^3
 
 sin cos tan log sqrt abs
 
@@ -49,10 +63,11 @@ y=sin(x)
 
 <h3>📚 설명</h3>
 <pre>
-y=ax → 직선
+y=ax → 정비례
+y=ax+b → 직선
 y=ax^2 → 포물선
 y=1/x → 반비례
-y=sin(x) → 물결
+y=sin(x) → 사인함수
 </pre>
 </div>
 </div>
@@ -85,26 +100,23 @@ function transform(input){
         .replace(/e/g,"Math.E");
 }
 
-function derivative(f,x){
-    let h=0.0001;
-    return (f(x+h)-f(x-h))/(2*h);
-}
+function getDesc(expr, input){
+    let t=input.toLowerCase();
 
-function integrate(f,a,b){
-    let sum=0;
-    let n=200;
-    let dx=(b-a)/n;
-    for(let i=0;i<n;i++){
-        let x=a+i*dx;
-        sum+=f(x)*dx;
-    }
-    return sum;
-}
+    if(t.includes("sin")) return "사인 함수 (주기적)";
+    if(t.includes("cos")) return "코사인 함수";
+    if(t.includes("tan")) return "탄젠트 (점근선)";
+    if(t.includes("1/x")) return "반비례 그래프";
+    if(t.includes("log")) return "로그 함수";
+    if(t.includes("sqrt")) return "루트 함수";
+    if(t.includes("abs")) return "절댓값 함수";
 
-function getDesc(expr){
-    if(expr.includes("1/x")) return "반비례";
-    if(expr.includes("x*x")) return "이차함수";
-    if(expr.includes("Math.sin")) return "사인";
+    if(t.match(/x\^?2|xx/)) return "이차함수 (포물선)";
+    if(t.match(/x\^?3|xxx/)) return "삼차함수";
+
+    if(t.match(/y=\d*x$/)) return "정비례";
+    if(t.match(/y=\d*x\+\d+/)) return "일차함수";
+
     return "일반 함수";
 }
 
@@ -133,10 +145,8 @@ function addGraph(){
 
     div.innerHTML=`
     <b>#${id}</b> ${input}
-    <br>${getDesc(expr)}
+    <br>${getDesc(expr,input)}
     <br>
-    <button onclick="drawTangent(${id})">접선</button>
-    <button onclick="calcArea(${id})">넓이</button>
     <button onclick="removeGraph(${id})">삭제</button>
     `;
 
@@ -203,37 +213,28 @@ function loop(){
 }
 loop();
 
-function drawTangent(i){
-    let g=graphs.find(x=>x.id===i);
-    let x=0;
-    let y=g.f(x);
-    let slope=derivative(g.f,x);
+canvas.addEventListener("click", function(e){
+    let rect=canvas.getBoundingClientRect();
 
-    ctx.strokeStyle="red";
-    ctx.beginPath();
+    let px=e.clientX-rect.left;
+    let py=e.clientY-rect.top;
 
-    for(let px=0;px<canvas.width;px++){
-        let xx=(px-originX)/scale;
-        let yy=slope*(xx-x)+y;
-        let py=originY-yy*scale;
+    let x=(px-originX)/scale;
+    let y=(originY-py)/scale;
 
-        if(px===0) ctx.moveTo(px,py);
-        else ctx.lineTo(px,py);
-    }
+    let text=`좌표: (${x.toFixed(3)}, ${y.toFixed(3)})<br>`;
 
-    ctx.stroke();
-}
+    graphs.forEach(g=>{
+        let fy;
+        try{fy=g.f(x);}catch{return;}
 
-function calcArea(i){
-    let g=graphs.find(x=>x.id===i);
+        if(isFinite(fy)){
+            text+=`#${g.id} ${g.input} → y=${fy.toFixed(3)} (${getDesc(g.expr,g.input)})<br>`;
+        }
+    });
 
-    let a=prompt("시작 x값");
-    let b=prompt("끝 x값");
-
-    let result=integrate(g.f,Number(a),Number(b));
-
-    alert("넓이 ≈ "+result.toFixed(4));
-}
+    document.getElementById("info").innerHTML=text;
+});
 </script>
 
 </body>
