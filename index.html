@@ -2,36 +2,38 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>그래프</title>
+<title>그래프 계산기</title>
 </head>
 
 <body>
 
-<h2>📈 그래프</h2>
+<h2>📈 그래프 계산기</h2>
 
 <p>
 ※ 입력 규칙<br>
-- xx = x²<br>
-- xxx = x³<br>
+- xx = x² / xxx = x³<br>
+- x^2 가능<br>
+- sin, cos, tan, log, sqrt, abs 지원<br>
 </p>
 
-<input id="graphInput" value="y=xx">
+<input id="graphInput" value="y=sin(x)">
 <button onclick="drawGraph()">그리기</button>
 
 <p id="coord">(x, y)</p>
 
-<svg id="graphSVG" width="600" height="400" style="border:1px solid #ccc;"></svg>
+<svg id="graphSVG" width="700" height="450" style="border:1px solid #ccc;"></svg>
 
 <script>
 
 const svg = document.getElementById("graphSVG");
 
-const W = 600;
-const H = 400;
-const scale = 30;
+const W = 700;
+const H = 450;
+
+let scale = 40; // 자동 느낌용 기본값
 
 
-// ===== 마우스 좌표 표시 =====
+// ===== 마우스 좌표 =====
 svg.addEventListener("mousemove", function(e){
 
     const rect = svg.getBoundingClientRect();
@@ -47,53 +49,93 @@ svg.addEventListener("mousemove", function(e){
 });
 
 
+// ===== 수식 변환 =====
+function convert(expr){
+
+    return expr
+        .replace("y=","")
+        .replace(/\s/g,"")
+
+        // ^ → **
+        .replace(/\^/g, "**")
+
+        // xx → x*x
+        .replace(/x{2,}/g, (m)=>m.split("").join("*"))
+
+        // 2x → 2*x
+        .replace(/(\d)x/g, "$1*x")
+
+        // x2 → x*2
+        .replace(/x(\d)/g, "x*$1")
+
+        // 괄호
+        .replace(/\)x/g, ")*x")
+        .replace(/x\(/g, "x*(")
+        .replace(/\)\(/g, ")*(")
+
+        // 수학 함수
+        .replace(/sin/g, "Math.sin")
+        .replace(/cos/g, "Math.cos")
+        .replace(/tan/g, "Math.tan")
+        .replace(/log/g, "Math.log")
+        .replace(/sqrt/g, "Math.sqrt")
+        .replace(/abs/g, "Math.abs")
+        .replace(/exp/g, "Math.exp");
+}
 
 
-// ===== 눈금 =====
+// ===== 그리드 =====
 function drawGrid(){
 
-    let grid = "";
+    let g = "";
 
     for(let i=-10;i<=10;i++){
 
         let x = W/2 + i*scale;
         let y = H/2 - i*scale;
 
-        // 세로선
-        grid += `<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="#ddd"/>`;
+        g += `<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="#eee"/>`;
+        g += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#eee"/>`;
 
-        // 가로선
-        grid += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#ddd"/>`;
-
-        // 숫자
         if(i !== 0){
-
-            grid += `<text x="${x+2}" y="${H/2+12}" font-size="10">${i}</text>`;
-            grid += `<text x="${W/2+5}" y="${y-2}" font-size="10">${i}</text>`;
+            g += `<text x="${x+2}" y="${H/2+12}" font-size="10">${i}</text>`;
+            g += `<text x="${W/2+5}" y="${y-2}" font-size="10">${i}</text>`;
         }
     }
 
-    // 축
-    grid += `
+    g += `
     <line x1="${W/2}" y1="0" x2="${W/2}" y2="${H}" stroke="black"/>
     <line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="black"/>
     `;
 
-    return grid;
+    return g;
 }
 
 
+// ===== 자동 스케일 =====
+function autoScale(f){
+
+    let maxY = 1;
+
+    for(let x=-10;x<=10;x+=0.5){
+        let y = f(x);
+        if(isFinite(y)){
+            maxY = Math.max(maxY, Math.abs(y));
+        }
+    }
+
+    scale = Math.min(80, 200 / maxY);
+}
 
 
+// ===== 메인 =====
 function drawGraph(){
 
-    svg.innerHTML = drawGrid();
+    svg.innerHTML = "";
 
     let input = document.getElementById("graphInput").value;
 
-    let expr = input.replace("y=","");
-
-    expr = expr.replace(/x{2,}/g, (m)=>m.split("").join("*"));
+    let expr = convert(input);
 
     let f;
 
@@ -104,13 +146,14 @@ function drawGraph(){
         return;
     }
 
-    // ===== 애니메이션 =====
+    autoScale(f);
+
     let x = -10;
     let points = "";
 
     function animate(){
 
-        for(let i=0;i<5;i++){
+        for(let i=0;i<6;i++){
 
             if(x > 10) return;
 
@@ -128,12 +171,7 @@ function drawGraph(){
         }
 
         svg.innerHTML = drawGrid() + `
-        <polyline
-        points="${points}"
-        stroke="red"
-        fill="none"
-        stroke-width="2"
-        />
+        <polyline points="${points}" stroke="red" fill="none" stroke-width="2"/>
         `;
 
         requestAnimationFrame(animate);
@@ -145,16 +183,13 @@ function drawGraph(){
     let xs = [-5, 0, 5];
 
     xs.forEach(x=>{
-
         let y = f(x);
         if(!isFinite(y)) return;
 
         let sx = W/2 + x*scale;
         let sy = H/2 - y*scale;
 
-        svg.innerHTML += `
-        <circle cx="${sx}" cy="${sy}" r="4" fill="blue"/>
-        `;
+        svg.innerHTML += `<circle cx="${sx}" cy="${sy}" r="4" fill="blue"/>`;
     });
 
     // ===== 직사각형 =====
@@ -173,14 +208,10 @@ function drawGraph(){
         let sy2 = H/2 - y2*scale;
 
         svg.innerHTML += `
-        <rect
-        x="${sx1}"
-        y="${sy2}"
+        <rect x="${sx1}" y="${sy2}"
         width="${sx2 - sx1}"
         height="${sy1 - sy2}"
-        fill="green"
-        opacity="0.2"
-        />
+        fill="green" opacity="0.2"/>
         `;
     }
 }
