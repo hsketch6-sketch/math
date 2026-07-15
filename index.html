@@ -1232,20 +1232,70 @@ function drawAllGraphs(){
 
 
 
-        svg.innerHTML+=`
+svg.innerHTML+=`
 
-        <polyline
+<polyline
 
-        points="${points}"
+points="${points}"
 
-        class="line"
+class="line"
 
-        style="stroke:hsl(${index*80},70%,50%)"
+style="stroke:hsl(${index*80},70%,50%)"
 
-        />
+/>
 
-        `;
+`;
+for(let x=-8;x<=8;x+=1){
 
+    let y;
+
+    if(graph.type==="linear"){
+        y=graph.a*x+graph.b;
+    }
+
+    if(graph.type==="inverse"){
+        if(x===0) continue;
+        y=graph.k/x;
+    }
+
+
+    let sx=W/2+x*scale;
+    let sy=H/2-y*scale;
+
+
+    svg.innerHTML+=`
+
+    <circle
+
+    cx="${sx}"
+
+    cy="${sy}"
+
+    r="5"
+
+    fill="black"
+
+    />
+
+
+    <text
+
+    x="${sx+8}"
+
+    y="${sy-8}"
+
+    font-size="14"
+
+    >
+
+    (${x},${Number(y.toFixed(1))})
+
+    </text>
+
+    `;
+
+
+}
 
 
 
