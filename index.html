@@ -254,7 +254,17 @@ placeholder="Example: y=2x+1">
 Add
 
 </button>
+<select id="language" onchange="changeLanguage()">
 
+<option value="en">
+English
+</option>
+
+<option value="ko">
+한국어
+</option>
+
+</select>
 
 </div>
 
@@ -451,9 +461,96 @@ log(x)
    CONCEPT DATABASE
 ========================= */
 
-
+let currentLanguage="en";
 const graphConcepts = {
+const translations={
 
+
+linear:{
+ko:{
+title:"일차함수",
+shape:"직선으로 나타나는 그래프입니다.",
+properties:[
+"y=ax+b 형태의 식입니다.",
+"기울기가 방향과 가파른 정도를 결정합니다.",
+"변화율이 일정합니다."
+],
+category:"대수 → 일차함수"
+}
+},
+
+
+quadratic:{
+ko:{
+title:"이차함수",
+shape:"포물선 모양의 그래프입니다.",
+properties:[
+"x² 항을 포함합니다.",
+"꼭짓점을 가집니다.",
+"대칭축을 가집니다."
+],
+category:"대수 → 이차함수"
+}
+},
+
+
+sin:{
+ko:{
+title:"사인 함수",
+shape:"반복되는 파동 모양의 그래프입니다.",
+properties:[
+"일정한 주기로 반복됩니다.",
+"기본 범위는 -1부터 1입니다.",
+"주기 함수입니다."
+],
+category:"삼각함수 → 사인"
+}
+},
+
+
+cos:{
+ko:{
+title:"코사인 함수",
+shape:"반복되는 파동 그래프입니다.",
+properties:[
+"사인 함수와 비슷하지만 이동된 형태입니다.",
+"-1부터 1 사이의 값을 가집니다.",
+"주기적으로 반복됩니다."
+],
+category:"삼각함수 → 코사인"
+}
+},
+
+
+tan:{
+ko:{
+title:"탄젠트 함수",
+shape:"끊어진 반복 곡선입니다.",
+properties:[
+"점근선을 가집니다.",
+"주기적으로 반복됩니다.",
+"점근선 근처에서 값이 매우 커집니다."
+],
+category:"삼각함수 → 탄젠트"
+}
+},
+
+
+inverse:{
+ko:{
+title:"반비례",
+shape:"두 개의 떨어진 곡선입니다.",
+properties:[
+"y=a/x 형태입니다.",
+"x와 y의 곱은 일정합니다.",
+"축에 가까워지지만 만나지 않습니다."
+],
+category:"대수 → 반비례"
+}
+
+}
+
+};
 linear:{
     title:"Linear Function",
     shape:"A straight line graph.",
@@ -1062,6 +1159,39 @@ function addGraph(){
     createGraphItem(
         id,
         input
+     let key;
+
+
+if(concept===graphConcepts.linear)
+key="linear";
+
+else if(concept===graphConcepts.quadratic)
+key="quadratic";
+
+else if(concept===graphConcepts.sin)
+key="sin";
+
+else if(concept===graphConcepts.cos)
+key="cos";
+
+else if(concept===graphConcepts.tan)
+key="tan";
+
+else if(concept===graphConcepts.inverse)
+key="inverse";
+
+
+
+if(
+currentLanguage==="ko"
+&&
+translations[key]
+){
+
+concept=
+translations[key].ko;
+
+}
     );
 
 
@@ -1863,6 +1993,32 @@ addGraph();
 /* START */
 
 resizeCanvas();
+ function changeLanguage(){
+
+
+currentLanguage=
+document.getElementById("language").value;
+
+
+
+document
+.getElementById("list")
+.innerHTML="";
+
+
+
+graphs.forEach(g=>{
+
+createGraphItem(
+g.id,
+g.input
+);
+
+
+});
+
+
+}
     </script>
 
 </body>
