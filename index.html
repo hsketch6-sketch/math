@@ -1,371 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <title>Ultimate Graph Calculator</title>
 
 <style>
-body { margin:0; font-family:sans-serif; }
-
-#container { display:flex; height:100vh; }
-
-#left {
-    width:70%;
+body{
+    margin:0;
     display:flex;
     flex-direction:column;
+    height:100vh;
 }
 
-#topbar {
-    padding:10px;
-    background:#222;
-    color:white;
-}
-
-#topbar input {
-    width:200px;
-}
-
-#canvasWrap {
-    flex:1;
-}
-
-canvas {
-    width:100%;
-    height:100%;
-    border-top:1px solid #000;
-    cursor:crosshair;
-}
-
-#info {
-    height:120px;
-    overflow:auto;
+#topbar{
     background:#111;
-    color:#0f0;
+    color:white;
     padding:10px;
-    font-size:14px;
 }
 
-#list {
-    height:150px;
-    overflow:auto;
-    border-top:1px solid #ccc;
+#canvasWrap{
+    flex:1;
+    position:relative;
+    overflow:hidden;
 }
 
-.graphItem {
-    padding:5px;
-    border-bottom:1px solid #ddd;
-}
-
-#right {
-    width:30%;
-    overflow:auto;
-    background:#f4f4f4;
-    padding:15px;
+canvas{
+    display:block;
 }
 </style>
 </head>
+
 <body>
 
-<div id="container">
-
-<div id="left">
-
 <div id="topbar">
-📈 Ultimate Graph Calculator  
-<input id="input" placeholder="y=sin(x)+x^2">
-<button onclick="addGraph()">Add</button>
+    Ultimate Graph Calculator
 </div>
 
 <div id="canvasWrap">
-<canvas id="canvas" width="900" height="600"></canvas>
-</div>
-
-<div id="info">👉 Click graph to see detailed values</div>
-
-<div id="list"></div>
-
-</div>
-
-<div id="right">
-
-<h2>📘 Usage Guide</h2>
-<pre>
-[Input Rules]
-Use:
-x^2 → power
-xx → x²
-xxx → x³
-
-Auto-multiplication:
-2x → 2*x
-
--------------------------
-
-[Functions]
-
-sin(x) → wave (periodic)
-cos(x) → shifted wave
-tan(x) → repeating with gaps
-
-log(x) → ln(x), x>0
-sqrt(x) → √x
-abs(x) → |x|
-
-Constant:
-e = 2.718...
-
--------------------------
-
-[Examples]
-
-y=2x+1 → line
-y=xx → parabola
-y=1/x → hyperbola
-y=sin(x) → wave
-
--------------------------
-
-[Tips]
-
-Combine freely:
-y = sin(x)+x^2
-
-Invalid domain:
-log(x), sqrt(x)
-
-Graph disappears?
-→ value too large or undefined
-</pre>
-
-<h2>📚 Graph Theory</h2>
-<pre>
-[Linear]
-y=ax+b
-→ straight line
-→ slope a
-→ intercept b
-
-[Proportional]
-y=ax
-→ passes (0,0)
-
-[Quadratic]
-y=ax²
-→ parabola
-→ has vertex
-
-[Cubic]
-y=ax³
-→ S-shape
-
-[Inverse]
-y=1/x
-→ hyperbola
-→ asymptotes
-
-[Trigonometric]
-
-sin(x)
-→ smooth wave
-→ range [-1,1]
-
-cos(x)
-→ starts at 1
-
-tan(x)
-→ infinite jumps
-
-[Log]
-y=log(x)
-→ x>0 only
-
-[Sqrt]
-y=√x
-→ starts (0,0)
-
-[Absolute]
-y=|x|
-→ V shape
-</pre>
-
-</div>
+    <canvas id="canvas"></canvas>
 </div>
 
 <script>
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-let graphs=[];
-let id=0;
+let originX, originY;
+let scale = 50;
 
-let scale=50;
-let originX=canvas.width/2;
-let originY=canvas.height/2;
+// ✅ 캔버스 크기 동기화 (핵심)
+function resizeCanvas(){
+    const rect = canvas.parentElement.getBoundingClientRect();
 
-function transform(input){
-    return input
-    .replace("y=","")
-    .replace(/\s/g,"")
-    .replace(/x{2,}/g,m=>m.split("").join("*"))
-    .replace(/\^/g,"**")
-    .replace(/(\d)x/g,"$1*x")
-    .replace(/x(\d)/g,"x*$1")
-    .replace(/sin/g,"Math.sin")
-    .replace(/cos/g,"Math.cos")
-    .replace(/tan/g,"Math.tan")
-    .replace(/log/g,"Math.log")
-    .replace(/sqrt/g,"Math.sqrt")
-    .replace(/abs/g,"Math.abs")
-    .replace(/e/g,"Math.E");
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    originX = canvas.width / 2;
+    originY = canvas.height / 2;
+
+    draw();
 }
 
-function getDesc(input){
-    let t=input.toLowerCase();
+window.addEventListener("resize", resizeCanvas);
 
-    if(t.includes("sin")) return "Sine → periodic wave";
-    if(t.includes("cos")) return "Cosine → shifted wave";
-    if(t.includes("tan")) return "Tangent → asymptotes";
-    if(t.includes("1/x")) return "Inverse → hyperbola";
-    if(t.includes("log")) return "Log → x>0";
-    if(t.includes("sqrt")) return "Sqrt → x≥0";
-    if(t.includes("abs")) return "Absolute → V shape";
-    if(t.match(/xx/)) return "Quadratic → parabola";
-    if(t.match(/xxx/)) return "Cubic → S curve";
-    if(t.match(/x/)) return "Linear or polynomial";
-
-    return "Function";
+// 좌표 변환
+function toScreenX(x){
+    return originX + x * scale;
+}
+function toScreenY(y){
+    return originY - y * scale;
 }
 
-function addGraph(){
-    let input=document.getElementById("input").value;
-    if(!input) return;
-
-    let expr=transform(input);
-
-    let f;
-    try{
-        f=new Function("x","return "+expr);
-        f(1);
-    }catch{
-        alert("Invalid");
-        return;
-    }
-
-    let color=`hsl(${Math.random()*360},70%,50%)`;
-
-    graphs.push({id,f,input,color});
-
-    let div=document.createElement("div");
-    div.className="graphItem";
-    div.id="g"+id;
-
-    div.innerHTML=`
-    <b>#${id}</b> ${input}
-    <br>${getDesc(input)}
-    <button onclick="removeGraph(${id})">❌</button>
-    `;
-
-    document.getElementById("list").appendChild(div);
-
-    id++;
-}
-
-function removeGraph(i){
-    graphs=graphs.filter(g=>g.id!==i);
-    document.getElementById("g"+i).remove();
-}
-
+// 축 그리기
 function drawAxis(){
-    ctx.strokeStyle="#000";
+    ctx.strokeStyle = "#888";
+    ctx.lineWidth = 1;
 
+    // x축
     ctx.beginPath();
-    ctx.moveTo(0,originY);
-    ctx.lineTo(canvas.width,originY);
+    ctx.moveTo(0, originY);
+    ctx.lineTo(canvas.width, originY);
     ctx.stroke();
 
+    // y축
     ctx.beginPath();
-    ctx.moveTo(originX,0);
-    ctx.lineTo(originX,canvas.height);
+    ctx.moveTo(originX, 0);
+    ctx.lineTo(originX, canvas.height);
     ctx.stroke();
-
-    ctx.fillStyle="#000";
-
-    for(let i=-10;i<=10;i++){
-        let x=originX+i*scale;
-        let y=originY+i*scale;
-
-        ctx.fillText(i,x-5,originY+15);
-        if(i!==0) ctx.fillText(-i,originX+5,y+3);
-    }
 }
 
-function drawGraphs(){
-    graphs.forEach(g=>{
-        ctx.strokeStyle=g.color;
-        ctx.beginPath();
+// 그래프
+function drawGraph(){
+    ctx.strokeStyle = "orange";
+    ctx.lineWidth = 2;
 
-        let prev=false;
+    ctx.beginPath();
 
-        for(let i=0;i<canvas.width;i++){
-            let x=(i-originX)/scale;
-            let y;
+    let first = true;
 
-            try{y=g.f(x);}catch{prev=false;continue;}
+    for(let px=0; px<canvas.width; px++){
+        let x = (px - originX) / scale;
+        let y = 3 * x; // 테스트 함수
 
-            if(!isFinite(y)||Math.abs(y)>1000){
-                prev=false;
-                continue;
-            }
+        let py = toScreenY(y);
 
-            let py=originY-y*scale;
-
-            if(!prev){
-                ctx.moveTo(i,py);
-                prev=true;
-            }else{
-                ctx.lineTo(i,py);
-            }
+        if(first){
+            ctx.moveTo(px, py);
+            first = false;
+        }else{
+            ctx.lineTo(px, py);
         }
+    }
 
-        ctx.stroke();
-    });
+    ctx.stroke();
 }
 
+// 전체 draw
 function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
+
     drawAxis();
-    drawGraphs();
+    drawGraph();
 }
 
-function loop(){
-    draw();
-    requestAnimationFrame(loop);
-}
-loop();
-
-canvas.addEventListener("click", e=>{
-    let rect=canvas.getBoundingClientRect();
-
-    let px=e.clientX-rect.left;
-    let py=e.clientY-rect.top;
-
-    let x=(px-originX)/scale;
-
-    let text=`Clicked x = ${x.toFixed(3)}\n\n`;
-
-    graphs.forEach(g=>{
-        try{
-            let val=g.f(x);
-
-            text+=`[Graph #${g.id}] ${g.input}\n`;
-            text+=`y = ${val.toFixed(4)}\n`;
-            text+=`${getDesc(g.input)}\n\n`;
-
-        }catch{}
-    });
-
-    document.getElementById("info").innerText=text;
-});
+// 초기 실행
+resizeCanvas();
 </script>
 
 </body>
