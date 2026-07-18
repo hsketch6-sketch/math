@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>그래프 계산기</title>
+<title>Graph Calculator</title>
 <style>
 body { font-family: sans-serif; }
 
@@ -21,9 +21,9 @@ canvas { border:1px solid black; cursor:crosshair; }
 #info {
     margin-top:10px;
     padding:10px;
-    background:#222;
+    background:#111;
     color:#0f0;
-    min-height:50px;
+    min-height:60px;
 }
 </style>
 </head>
@@ -31,44 +31,48 @@ canvas { border:1px solid black; cursor:crosshair; }
 
 <div id="top">
 <div id="left">
-<h2>📈 그래프 계산기</h2>
+
+<h2>📈 Graph Calculator</h2>
 
 <input id="input" placeholder="y=2x+1">
-<button onclick="addGraph()">추가</button>
+<button onclick="addGraph()">Add</button>
 
 <canvas id="canvas" width="800" height="500"></canvas>
 
-<div id="info">👉 그래프 클릭하면 좌표 & 설명 표시됨</div>
+<div id="info">👉 Click on graph to see coordinates & values</div>
 
-<h3>📊 그래프 목록</h3>
+<h3>📊 Graph List</h3>
 <div id="list"></div>
 
 </div>
 
 <div id="right">
-<h3>📘 사용법</h3>
+
+<h3>📘 Usage</h3>
 <pre>
-^ 사용 가능
+Use ^ for power
 xx = x^2
 xxx = x^3
 
+Functions:
 sin cos tan log sqrt abs
 
-예:
+Examples:
 y=2x+1
 y=xx
 y=1/x
 y=sin(x)
 </pre>
 
-<h3>📚 설명</h3>
+<h3>📚 Graph Types</h3>
 <pre>
-y=ax → 정비례
-y=ax+b → 직선
-y=ax^2 → 포물선
-y=1/x → 반비례
-y=sin(x) → 사인함수
+y=ax → linear (proportional)
+y=ax+b → linear
+y=ax^2 → quadratic
+y=1/x → inverse
+y=sin(x) → sine wave
 </pre>
+
 </div>
 </div>
 
@@ -100,24 +104,24 @@ function transform(input){
         .replace(/e/g,"Math.E");
 }
 
-function getDesc(expr, input){
+function getDesc(input){
     let t=input.toLowerCase();
 
-    if(t.includes("sin")) return "사인 함수 (주기적)";
-    if(t.includes("cos")) return "코사인 함수";
-    if(t.includes("tan")) return "탄젠트 (점근선)";
-    if(t.includes("1/x")) return "반비례 그래프";
-    if(t.includes("log")) return "로그 함수";
-    if(t.includes("sqrt")) return "루트 함수";
-    if(t.includes("abs")) return "절댓값 함수";
+    if(t.includes("sin")) return "Sine — periodic wave";
+    if(t.includes("cos")) return "Cosine — shifted sine wave";
+    if(t.includes("tan")) return "Tangent — asymptotic curve";
+    if(t.includes("1/x")) return "Inverse — hyperbola";
+    if(t.includes("log")) return "Logarithmic — slow growth";
+    if(t.includes("sqrt")) return "Square root — starts at 0";
+    if(t.includes("abs")) return "Absolute — V shape";
 
-    if(t.match(/x\^?2|xx/)) return "이차함수 (포물선)";
-    if(t.match(/x\^?3|xxx/)) return "삼차함수";
+    if(t.match(/x\^?2|xx/)) return "Quadratic — parabola";
+    if(t.match(/x\^?3|xxx/)) return "Cubic — S curve";
 
-    if(t.match(/y=\d*x$/)) return "정비례";
-    if(t.match(/y=\d*x\+\d+/)) return "일차함수";
+    if(t.match(/y=\d*x$/)) return "Linear (Proportional) — through origin";
+    if(t.match(/y=\d*x\+\d+/)) return "Linear — straight line";
 
-    return "일반 함수";
+    return "General function";
 }
 
 function addGraph(){
@@ -131,13 +135,13 @@ function addGraph(){
         f=new Function("x","return "+expr);
         f(1);
     }catch{
-        alert("수식 오류");
+        alert("Invalid expression");
         return;
     }
 
     let color=`hsl(${Math.random()*360},70%,50%)`;
 
-    graphs.push({id,f,expr,input,color});
+    graphs.push({id,f,input,color});
 
     let div=document.createElement("div");
     div.className="graphItem";
@@ -145,9 +149,9 @@ function addGraph(){
 
     div.innerHTML=`
     <b>#${id}</b> ${input}
-    <br>${getDesc(expr,input)}
+    <br>${getDesc(input)}
     <br>
-    <button onclick="removeGraph(${id})">삭제</button>
+    <button onclick="removeGraph(${id})">Remove</button>
     `;
 
     document.getElementById("list").appendChild(div);
@@ -222,14 +226,14 @@ canvas.addEventListener("click", function(e){
     let x=(px-originX)/scale;
     let y=(originY-py)/scale;
 
-    let text=`좌표: (${x.toFixed(3)}, ${y.toFixed(3)})<br>`;
+    let text=`(x, y) = (${x.toFixed(3)}, ${y.toFixed(3)})<br>`;
 
     graphs.forEach(g=>{
         let fy;
         try{fy=g.f(x);}catch{return;}
 
         if(isFinite(fy)){
-            text+=`#${g.id} ${g.input} → y=${fy.toFixed(3)} (${getDesc(g.expr,g.input)})<br>`;
+            text+=`#${g.id} ${g.input} → y=${fy.toFixed(3)} (${getDesc(g.input)})<br>`;
         }
     });
 
