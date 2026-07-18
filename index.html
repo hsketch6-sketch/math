@@ -1,20 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ultimate Graph Calculator</title>
+
+<style>
 body {
     margin:0;
     font-family:sans-serif;
 }
 
-/* ⭐ 핵심: height → min-height */
 #container {
     display:flex;
-    min-height:100vh; /* 변경 */
+    min-height:100vh;
 }
 
-/* 왼쪽 영역 */
 #left {
     width:70%;
     display:flex;
     flex-direction:column;
-    overflow:hidden; /* 내부 정리 */
+    overflow:hidden;
 }
 
 #topbar {
@@ -27,10 +32,9 @@ body {
     width:200px;
 }
 
-/* ⭐ 핵심: flex + min-height */
 #canvasWrap {
     flex:1;
-    min-height:0; /* 매우 중요 */
+    min-height:0;
 }
 
 canvas {
@@ -40,7 +44,6 @@ canvas {
     cursor:crosshair;
 }
 
-/* 하단 정보 */
 #info {
     height:120px;
     overflow:auto;
@@ -51,7 +54,6 @@ canvas {
     flex-shrink:0;
 }
 
-/* ⭐ 리스트 안 잘리게 */
 #list {
     height:150px;
     overflow:auto;
@@ -64,10 +66,171 @@ canvas {
     border-bottom:1px solid #ddd;
 }
 
-/* 오른쪽 설명 */
 #right {
     width:30%;
     overflow:auto;
     background:#f4f4f4;
     padding:15px;
 }
+</style>
+
+</head>
+
+<body>
+
+<div id="container">
+
+<div id="left">
+
+<div id="topbar">
+📈 Ultimate Graph Calculator  
+<input id="input" placeholder="y=sin(x)+x^2">
+<button onclick="addGraph()">Add</button>
+</div>
+
+<div id="canvasWrap">
+<canvas id="canvas" width="900" height="600"></canvas>
+</div>
+
+<div id="info">👉 Click graph to see values</div>
+
+<div id="list"></div>
+
+</div>
+
+<div id="right">
+<h2>📘 Usage</h2>
+<pre>
+y=2x+1
+y=xx
+y=sin(x)
+</pre>
+</div>
+
+</div>
+
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+let graphs=[];
+let id=0;
+
+let scale=50;
+let originX=canvas.width/2;
+let originY=canvas.height/2;
+
+function transform(input){
+    return input
+    .replace("y=","")
+    .replace(/\s/g,"")
+    .replace(/x{2,}/g,m=>m.split("").join("*"))
+    .replace(/\^/g,"**")
+    .replace(/(\d)x/g,"$1*x")
+    .replace(/x(\d)/g,"x*$1")
+    .replace(/sin/g,"Math.sin")
+    .replace(/cos/g,"Math.cos")
+    .replace(/tan/g,"Math.tan")
+    .replace(/log/g,"Math.log")
+    .replace(/sqrt/g,"Math.sqrt")
+    .replace(/abs/g,"Math.abs")
+    .replace(/e/g,"Math.E");
+}
+
+function addGraph(){
+    let input=document.getElementById("input").value;
+    if(!input) return;
+
+    let expr=transform(input);
+
+    let f;
+    try{
+        f=new Function("x","return "+expr);
+        f(1);
+    }catch{
+        alert("Invalid");
+        return;
+    }
+
+    let color=`hsl(${Math.random()*360},70%,50%)`;
+
+    graphs.push({id,f,input,color});
+
+    let div=document.createElement("div");
+    div.className="graphItem";
+    div.id="g"+id;
+
+    div.innerHTML=`
+    <b>#${id}</b> ${input}
+    <button onclick="removeGraph(${id})">❌</button>
+    `;
+
+    document.getElementById("list").appendChild(div);
+
+    id++;
+}
+
+function removeGraph(i){
+    graphs=graphs.filter(g=>g.id!==i);
+    document.getElementById("g"+i).remove();
+}
+
+function drawAxis(){
+    ctx.beginPath();
+    ctx.moveTo(0,originY);
+    ctx.lineTo(canvas.width,originY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(originX,0);
+    ctx.lineTo(originX,canvas.height);
+    ctx.stroke();
+}
+
+function drawGraphs(){
+    graphs.forEach(g=>{
+        ctx.strokeStyle=g.color;
+        ctx.beginPath();
+
+        let prev=false;
+
+        for(let i=0;i<canvas.width;i++){
+            let x=(i-originX)/scale;
+            let y;
+
+            try{y=g.f(x);}catch{prev=false;continue;}
+
+            if(!isFinite(y)||Math.abs(y)>1000){
+                prev=false;
+                continue;
+            }
+
+            let py=originY-y*scale;
+
+            if(!prev){
+                ctx.moveTo(i,py);
+                prev=true;
+            }else{
+                ctx.lineTo(i,py);
+            }
+        }
+
+        ctx.stroke();
+    });
+}
+
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawAxis();
+    drawGraphs();
+}
+
+function loop(){
+    draw();
+    requestAnimationFrame(loop);
+}
+loop();
+</script>
+
+</body>
+</html>
