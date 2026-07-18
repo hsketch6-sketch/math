@@ -3,7 +3,11 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Ultimate Graph Calculator</title>
+
+<title>
+Educational Graph Calculator
+</title>
+
 
 <style>
 
@@ -16,9 +20,10 @@ html,body{
 
     margin:0;
     height:100%;
+
     overflow:hidden;
 
-    font-family:sans-serif;
+    font-family:Arial,sans-serif;
 
 }
 
@@ -29,20 +34,23 @@ html,body{
     display:flex;
 
     width:100vw;
+
     height:100vh;
 
 }
 
 
 
-/* LEFT */
+/* LEFT AREA */
 
 #left{
 
     width:70%;
+
     height:100%;
 
     display:flex;
+
     flex-direction:column;
 
     min-height:0;
@@ -56,6 +64,7 @@ html,body{
 #topbar{
 
     background:#222;
+
     color:white;
 
     padding:10px;
@@ -68,12 +77,13 @@ html,body{
 
 #input{
 
-    width:250px;
+    width:260px;
 
-    padding:5px;
+    padding:6px;
+
+    font-size:15px;
 
 }
-
 
 
 
@@ -85,7 +95,7 @@ button{
 
 
 
-/* CANVAS */
+/* GRAPH */
 
 #canvasWrap{
 
@@ -100,18 +110,16 @@ button{
 canvas{
 
     width:100%;
+
     height:100%;
 
     display:block;
 
     background:white;
 
-    border-top:1px solid black;
-
     cursor:grab;
 
 }
-
 
 
 canvas:active{
@@ -122,11 +130,12 @@ canvas:active{
 
 
 
+
 /* INFO */
 
 #info{
 
-    height:120px;
+    height:100px;
 
     flex-shrink:0;
 
@@ -138,21 +147,19 @@ canvas:active{
 
     padding:10px;
 
-    font-size:14px;
-
 }
 
 
 
-/* LIST */
+/* GRAPH LIST */
 
 #list{
 
-    height:150px;
-
-    flex-shrink:0;
+    height:170px;
 
     overflow:auto;
+
+    flex-shrink:0;
 
     border-top:1px solid #ccc;
 
@@ -162,11 +169,29 @@ canvas:active{
 
 .graphItem{
 
-    padding:6px;
+    padding:8px;
 
     border-bottom:1px solid #ddd;
 
 }
+
+
+
+.conceptBox{
+
+    margin-top:8px;
+
+    padding:10px;
+
+    background:#eeeeee;
+
+    border-radius:8px;
+
+    line-height:1.5;
+
+}
+
+
 
 
 
@@ -188,9 +213,15 @@ canvas:active{
 
 
 
-pre{
+.card{
 
-    white-space:pre-wrap;
+    background:white;
+
+    padding:12px;
+
+    margin-bottom:15px;
+
+    border-radius:10px;
 
 }
 
@@ -198,11 +229,12 @@ pre{
 
 </style>
 
-
 </head>
 
 
+
 <body>
+
 
 
 <div id="container">
@@ -214,13 +246,13 @@ pre{
 
 <div id="topbar">
 
-📈 Ultimate Graph Calculator
+📈 Educational Graph Calculator
 
-<br>
+<br><br>
 
 
 <input id="input"
-placeholder="Example: y=sin(x)+x^2">
+placeholder="Example: y=sin(x)">
 
 
 <button onclick="addGraph()">
@@ -244,7 +276,7 @@ Add
 
 <div id="info">
 
-Click graph to see values
+Click the graph to see values.
 
 </div>
 
@@ -265,159 +297,331 @@ Click graph to see values
 <div id="right">
 
 
-<h2>📘 Usage Guide</h2>
+<h2>
+📘 Guide
+</h2>
 
 
-<pre>
 
-Input:
+<div class="card">
+
+<b>Input Examples</b>
+
+<br><br>
 
 y=x^2
+
+<br>
+
 y=sin(x)
+
+<br>
+
 y=1/x
 
+<br>
 
-Power:
+y=sqrt(x)
 
-x^2
+<br>
 
-or
-
-xx
+</div>
 
 
-Functions:
+
+<div class="card">
+
+<b>Controls</b>
+
+<br><br>
+
+🖱 Drag
+
+<br>
+
+Move graph
+
+<br><br>
+
+🖱 Wheel
+
+<br>
+
+Zoom
+
+</div>
+
+
+
+<div class="card">
+
+<b>Functions</b>
+
+<br><br>
 
 sin(x)
+
+→ Sine wave
+
+<br><br>
+
 cos(x)
+
+→ Cosine wave
+
+<br><br>
+
 tan(x)
+
+→ Tangent
+
+<br><br>
 
 sqrt(x)
 
+→ Square root
+
+<br><br>
+
 abs(x)
 
-log(x)
-
-
-Controls:
-
-Drag mouse
-→ Move graph
-
-
-Mouse wheel
-→ Zoom
-
-
-</pre>
-
-
-
-<h2>📚 Graph Theory</h2>
-
-
-<pre>
-
-Linear
-
-y=ax+b
-
-Straight line
-
-
-Quadratic
-
-y=ax²
-
-Parabola
-
-
-Cubic
-
-y=ax³
-
-S curve
-
-
-Inverse
-
-y=1/x
-
-Hyperbola
-
-
-sin
-
-Wave
-
-
-cos
-
-Shifted wave
-
-
-tan
-
-Infinite jumps
-
-
-sqrt
-
-Starts from zero
-
-
-abs
-
-V shape
-
-</pre>
-
-
+→ Absolute value
 
 </div>
 
 
 
 </div>
+
+
+</div>
+
+
+
+
+
 <script>
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
 
-let graphs = [];
-let graphID = 0;
+const graphConcepts = {
 
 
-/*
-    Camera
-*/
+sin:{
 
-let scale = 50;
+title:"Sine Function",
 
-let originX = 0;
-let originY = 0;
+shape:
+"It is a smooth wave that repeats regularly.",
+
+properties:[
+
+"The output value is between -1 and 1.",
+
+"It is a periodic function.",
+
+"The pattern repeats forever."
+
+],
+
+category:
+"Trigonometry → Sine Function"
+
+},
 
 
 
-/*
-    Resize
-*/
+cos:{
+
+title:"Cosine Function",
+
+shape:
+"It is a wave similar to sine but shifted.",
+
+properties:[
+
+"The output value is between -1 and 1.",
+
+"It is periodic.",
+
+"It starts at its maximum value when x=0."
+
+],
+
+category:
+"Trigonometry → Cosine Function"
+
+},
+
+
+
+tan:{
+
+title:"Tangent Function",
+
+shape:
+"It has repeating curves with gaps.",
+
+properties:[
+
+"It has vertical asymptotes.",
+
+"The value can become extremely large."
+
+],
+
+category:
+"Trigonometry → Tangent Function"
+
+},
+
+
+
+quadratic:{
+
+title:"Quadratic Function",
+
+shape:
+"It creates a U-shaped parabola.",
+
+properties:[
+
+"It has a vertex.",
+
+"It is symmetric.",
+
+"The coefficient changes the direction."
+
+],
+
+category:
+"Functions → Quadratic Function"
+
+},
+
+
+
+linear:{
+
+title:"Linear Function",
+
+shape:
+"It creates a straight line.",
+
+properties:[
+
+"The slope controls steepness.",
+
+"It has a constant rate of change."
+
+],
+
+category:
+"Functions → Linear Function"
+
+},
+
+
+
+inverse:{
+
+title:"Inverse Function",
+
+shape:
+"It creates two separated curves.",
+
+properties:[
+
+"It approaches the axes.",
+
+"It represents inverse relationships."
+
+],
+
+category:
+"Functions → Inverse Proportion"
+
+},
+
+
+
+sqrt:{
+
+title:"Square Root Function",
+
+shape:
+"It starts from zero and grows slowly.",
+
+properties:[
+
+"The input cannot be negative.",
+
+"The growth becomes slower."
+
+],
+
+category:
+"Functions → Square Root Function"
+
+},
+
+
+
+absolute:{
+
+title:"Absolute Value Function",
+
+shape:
+"It creates a V-shaped graph.",
+
+properties:[
+
+"Negative values become positive.",
+
+"It has a vertex."
+
+],
+
+category:
+"Functions → Absolute Value Function"
+
+}
+
+
+
+};
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+
+let graphs=[];
+let graphID=0;
+
+
+
+/* Camera */
+
+let scale=50;
+
+let originX=0;
+let originY=0;
+
+
+
+
+/* Resize */
 
 function resizeCanvas(){
 
-    canvas.width =
-    canvas.clientWidth;
-
-    canvas.height =
-    canvas.clientHeight;
+    canvas.width=canvas.clientWidth;
+    canvas.height=canvas.clientHeight;
 
 
-    originX =
-    canvas.width / 2;
+    if(originX===0){
 
+        originX=canvas.width/2;
+        originY=canvas.height/2;
 
-    originY =
-    canvas.height / 2;
+    }
 
 
     draw();
@@ -434,86 +638,117 @@ resizeCanvas
 
 
 
-/*
-    Transform input
-*/
+/* Find Concept */
+
+function getConcept(input){
+
+    let t=input.toLowerCase();
+
+
+    if(t.includes("sin"))
+        return graphConcepts.sin;
+
+
+    if(t.includes("cos"))
+        return graphConcepts.cos;
+
+
+    if(t.includes("tan"))
+        return graphConcepts.tan;
+
+
+    if(
+        t.includes("xx") ||
+        t.includes("^2")
+    )
+        return graphConcepts.quadratic;
+
+
+    if(t.includes("1/x"))
+        return graphConcepts.inverse;
+
+
+    if(t.includes("sqrt"))
+        return graphConcepts.sqrt;
+
+
+    if(t.includes("abs"))
+        return graphConcepts.absolute;
+
+
+    return graphConcepts.linear;
+
+}
+
+
+
+
+
+
+/* Convert Input */
 
 
 function transform(input){
 
-    let expr =
-    input
+    let expr=input
+    .toLowerCase()
     .replace(/^y=/,"")
     .replace(/\s/g,"");
 
 
-    expr =
-    expr.replace(
+
+    expr=expr.replace(
         /xx/g,
         "(x*x)"
     );
 
 
-    expr =
-    expr.replace(
+    expr=expr.replace(
         /\^/g,
         "**"
     );
 
 
-    expr =
-    expr.replace(
+    expr=expr.replace(
         /(\d)x/g,
         "$1*x"
     );
 
 
-    expr =
-    expr.replace(
+
+    expr=expr.replace(
         /sin/g,
         "Math.sin"
     );
 
 
-    expr =
-    expr.replace(
+    expr=expr.replace(
         /cos/g,
         "Math.cos"
     );
 
 
-    expr =
-    expr.replace(
+    expr=expr.replace(
         /tan/g,
         "Math.tan"
     );
 
 
-    expr =
-    expr.replace(
+    expr=expr.replace(
         /sqrt/g,
         "Math.sqrt"
     );
 
 
-    expr =
-    expr.replace(
+    expr=expr.replace(
         /abs/g,
         "Math.abs"
     );
 
 
-    expr =
-    expr.replace(
-        /\blog\b/g,
+    expr=expr.replace(
+        /log/g,
         "Math.log"
-    );
-
-
-    expr =
-    expr.replace(
-        /\be\b/g,
-        "Math.E"
     );
 
 
@@ -525,55 +760,16 @@ function transform(input){
 
 
 
-function getDesc(input){
-
-    input=input.toLowerCase();
-
-
-    if(input.includes("sin"))
-        return "Sine → wave";
-
-
-    if(input.includes("cos"))
-        return "Cosine → shifted wave";
-
-
-    if(input.includes("tan"))
-        return "Tangent → asymptote";
-
-
-    if(input.includes("sqrt"))
-        return "Square root";
-
-
-    if(input.includes("abs"))
-        return "Absolute value";
-
-
-    if(input.includes("1/x"))
-        return "Inverse function";
-
-
-    if(input.includes("xx"))
-        return "Quadratic parabola";
-
-
-    return "Function";
-
-}
 
 
 
-
-
-/*
-    Add graph
-*/
+/* Add Graph */
 
 
 function addGraph(){
 
-    let input =
+
+    let input=
     document.getElementById("input").value;
 
 
@@ -581,8 +777,8 @@ function addGraph(){
         return;
 
 
-    let expr =
-    transform(input);
+
+    let expr=transform(input);
 
 
     let f;
@@ -590,10 +786,9 @@ function addGraph(){
 
     try{
 
-        f =
-        new Function(
+        f=new Function(
             "x",
-            "return " + expr
+            "return "+expr
         );
 
 
@@ -611,9 +806,6 @@ function addGraph(){
 
 
 
-    let color =
-    `hsl(${Math.random()*360},70%,50%)`;
-
 
 
     graphs.push({
@@ -624,31 +816,104 @@ function addGraph(){
 
         f,
 
-        color
+        color:
+        `hsl(${Math.random()*360},70%,50%)`
 
     });
 
 
 
-    let div =
-    document.createElement("div");
 
+
+    let concept=getConcept(input);
+
+
+
+    let div=document.createElement("div");
 
     div.className="graphItem";
-
 
     div.id="graph"+graphID;
 
 
-    div.innerHTML=
 
-    `
-    <b>#${graphID}</b>
+    div.innerHTML=`
+
+    <b>
+    #${graphID}
+    </b>
+
     ${input}
+
 
     <br>
 
-    ${getDesc(input)}
+    <small>
+    ${concept.title}
+    </small>
+
+
+    <br><br>
+
+
+    <button onclick="toggleConcept(${graphID})">
+
+    What is this graph?
+
+    </button>
+
+
+
+    <div 
+    id="concept${graphID}"
+    class="conceptBox"
+    style="display:none">
+
+
+    <b>
+    This graph is the graph of ${input}.
+    </b>
+
+
+    <br><br>
+
+
+    <b>Shape:</b>
+
+    <br>
+
+    ${concept.shape}
+
+
+    <br><br>
+
+
+    <b>Properties:</b>
+
+    <br>
+
+    ${
+        concept.properties
+        .map(
+            x=>"• "+x
+        )
+        .join("<br>")
+    }
+
+
+    <br><br>
+
+
+    <b>Concept:</b>
+
+    <br>
+
+    ${concept.category}
+
+
+    </div>
+
+
 
     <button onclick="removeGraph(${graphID})">
 
@@ -678,23 +943,47 @@ function addGraph(){
 
 
 
+
+function toggleConcept(id){
+
+    let box=
+    document.getElementById(
+        "concept"+id
+    );
+
+
+    if(box.style.display==="none")
+
+        box.style.display="block";
+
+    else
+
+        box.style.display="none";
+
+}
+
+
+
+
+
+
 function removeGraph(id){
 
 
-    graphs =
+    graphs=
     graphs.filter(
         g=>g.id!==id
     );
 
 
-    let item =
+    let box=
     document.getElementById(
         "graph"+id
     );
 
 
-    if(item)
-        item.remove();
+    if(box)
+        box.remove();
 
 
     draw();
@@ -706,29 +995,26 @@ function removeGraph(id){
 
 
 
-/*
-    Coordinate
-*/
 
+
+
+/* Coordinate */
 
 function worldX(px){
 
-    return (
+    return(
         px-originX
-    )
-    /
-    scale;
+    )/scale;
 
 }
+
 
 
 function worldY(py){
 
-    return (
+    return(
         originY-py
-    )
-    /
-    scale;
+    )/scale;
 
 }
 
@@ -737,16 +1023,18 @@ function worldY(py){
 
 
 
-/*
-    Axis
-*/
+
+
+/* Axis */
 
 
 function drawAxis(){
 
-    ctx.strokeStyle="#999";
+
+    ctx.strokeStyle="#aaa";
 
     ctx.lineWidth=1;
+
 
 
     ctx.beginPath();
@@ -780,42 +1068,42 @@ function drawAxis(){
 
 
 
+
+
     ctx.fillStyle="#333";
 
     ctx.font="12px Arial";
 
 
 
-    for(
-        let i=-20;
-        i<=20;
-        i++
-    ){
-
-        let x =
-        originX+i*scale;
+    for(let i=-20;i<=20;i++){
 
 
         ctx.fillText(
+
             i,
-            x,
+
+            originX+i*scale,
+
             originY+15
+
         );
 
 
-
-        let y =
-        originY-i*scale;
-
+        if(i!==0)
 
         ctx.fillText(
+
             i,
+
             originX+5,
-            y
+
+            originY-i*scale
+
         );
+
 
     }
-
 
 }
 
@@ -825,9 +1113,9 @@ function drawAxis(){
 
 
 
-/*
-    Graph Drawing
-*/
+
+
+/* Draw Graph */
 
 
 function drawGraphs(){
@@ -836,9 +1124,7 @@ function drawGraphs(){
     graphs.forEach(g=>{
 
 
-        ctx.strokeStyle =
-        g.color;
-
+        ctx.strokeStyle=g.color;
 
         ctx.lineWidth=2;
 
@@ -857,9 +1143,7 @@ function drawGraphs(){
         ){
 
 
-            let x =
-            worldX(px);
-
+            let x=worldX(px);
 
             let y;
 
@@ -880,6 +1164,7 @@ function drawGraphs(){
 
 
 
+
             if(
                 !Number.isFinite(y)
                 ||
@@ -894,18 +1179,14 @@ function drawGraphs(){
 
 
 
-            let py =
+            let py=
             originY-y*scale;
 
 
 
             if(!started){
 
-                ctx.moveTo(
-                    px,
-                    py
-                );
-
+                ctx.moveTo(px,py);
 
                 started=true;
 
@@ -913,10 +1194,7 @@ function drawGraphs(){
 
             else{
 
-                ctx.lineTo(
-                    px,
-                    py
-                );
+                ctx.lineTo(px,py);
 
             }
 
@@ -931,6 +1209,9 @@ function drawGraphs(){
 
 
 }
+
+
+
 
 
 
@@ -957,15 +1238,16 @@ function draw(){
 
 
 
-/*
-    Mouse Drag
-*/
+
+
+
+
+/* Drag */
 
 
 let dragging=false;
 
-let lastX=0;
-let lastY=0;
+let lastX,lastY;
 
 
 
@@ -976,6 +1258,7 @@ e=>{
     dragging=true;
 
     lastX=e.clientX;
+
     lastY=e.clientY;
 
 });
@@ -1002,11 +1285,11 @@ e=>{
 
 
 
-    originX +=
+    originX+=
     e.clientX-lastX;
 
 
-    originY +=
+    originY+=
     e.clientY-lastY;
 
 
@@ -1014,6 +1297,7 @@ e=>{
     lastX=e.clientX;
 
     lastY=e.clientY;
+
 
 
     draw();
@@ -1028,9 +1312,8 @@ e=>{
 
 
 
-/*
-    Zoom
-*/
+
+/* Zoom */
 
 
 canvas.addEventListener(
@@ -1041,34 +1324,22 @@ e=>{
     e.preventDefault();
 
 
-    let mouseX =
-    e.offsetX;
 
-
-    let mouseY =
-    e.offsetY;
-
-
-
-    let beforeX =
-    worldX(mouseX);
-
-
-    let beforeY =
-    worldY(mouseY);
+    let oldScale=scale;
 
 
 
     if(e.deltaY<0)
+
         scale*=1.1;
 
     else
+
         scale/=1.1;
 
 
 
-    scale =
-    Math.max(
+    scale=Math.max(
         10,
         Math.min(
             scale,
@@ -1078,25 +1349,21 @@ e=>{
 
 
 
-    let afterX =
-    worldX(mouseX);
+    let mx=e.offsetX;
 
-
-    let afterY =
-    worldY(mouseY);
+    let my=e.offsetY;
 
 
 
-    originX +=
-    (afterX-beforeX)
-    *
-    scale;
+    originX =
+    mx-(mx-originX)
+    *(scale/oldScale);
 
 
-    originY -=
-    (afterY-beforeY)
-    *
-    scale;
+
+    originY =
+    my-(my-originY)
+    *(scale/oldScale);
 
 
 
@@ -1113,9 +1380,10 @@ e=>{
 
 
 
-/*
-    Click value
-*/
+
+
+
+/* Click Info */
 
 
 canvas.addEventListener(
@@ -1123,33 +1391,31 @@ canvas.addEventListener(
 e=>{
 
 
-    let x =
-    worldX(e.offsetX);
+    let x=worldX(e.offsetX);
 
 
-    let text =
+
+    let text=
     "x = "
-    +
-    x.toFixed(3)
-    +
-    "\n\n";
+    +x.toFixed(3)
+    +"\n\n";
 
 
 
     graphs.forEach(g=>{
 
 
-        let y =
-        g.f(x);
+        let y=g.f(x);
 
 
-        text +=
+
+        text+=
         g.input
         +
         "\n";
 
 
-        text +=
+        text+=
         "y = "
         +
         y.toFixed(4)
@@ -1167,6 +1433,7 @@ e=>{
 
 
 });
+
 
 
 
