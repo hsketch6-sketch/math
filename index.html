@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Ultra Graph</title>
+<title>Easy Graph (Desmos-lite)</title>
 <style>
 body { margin:0; font-family:sans-serif; }
 #container { display:flex; height:100vh; }
@@ -12,10 +12,10 @@ body { margin:0; font-family:sans-serif; }
 #canvasWrap { flex:1; }
 canvas { width:100%; height:100%; background:white; }
 
-#info { height:120px; overflow:auto; background:#111; color:#0f0; padding:10px; }
-#list { height:150px; overflow:auto; border-top:1px solid #ccc; }
-
+#log { height:120px; overflow:auto; background:#111; color:#0f0; padding:10px; }
 #right { width:30%; padding:15px; background:#f4f4f4; overflow:auto; }
+
+.warning { color:red; font-weight:bold; }
 </style>
 </head>
 <body>
@@ -24,7 +24,7 @@ canvas { width:100%; height:100%; background:white; }
 
 <div id="left">
 <div id="topbar">
-<input id="expr" placeholder="y=sin(x)/sin(x^2)">
+<input id="expr" style="width:70%" placeholder="y=sin(x)/sin(x^2)">
 <button onclick="draw()">Draw</button>
 </div>
 
@@ -32,28 +32,34 @@ canvas { width:100%; height:100%; background:white; }
 <canvas id="cv"></canvas>
 </div>
 
-<div id="info" id="log"></div>
-<div id="list"></div>
+<div id="log"></div>
 </div>
 
 <div id="right">
-<h3>Functions Guide</h3>
-<p><b>Supported:</b></p>
-<ul>
-<li>y = f(x)</li>
-<li>x = f(y)</li>
-<li>y = f(x,y)</li>
-</ul>
+<h2>📘 Function Guide</h2>
 
-<p><b>Examples:</b></p>
+<b>sin(x)</b><br>
+→ 파도처럼 반복되는 함수 (-1 ~ 1)<br><br>
+
+<b>cos(x)</b><br>
+→ sin을 옆으로 이동한 형태<br><br>
+
+<b>tan(x)</b><br>
+→ 특정 지점에서 값이 무한대로 튐<br><br>
+
+<hr>
+
+<h3>🧪 Examples</h3>
 <ul>
+<li>y=sin(x)</li>
 <li>y=sin(x)/sin(x^2)</li>
 <li>x=tan(y)</li>
 <li>y=tan(x*y)</li>
 </ul>
 
-<p><b>Note:</b><br>
-Very complex equations may be inaccurate.</p>
+<hr>
+
+⚠️ 복잡한 식은 부정확할 수 있음
 </div>
 
 </div>
@@ -69,60 +75,104 @@ function resize(){
 window.onresize = resize;
 resize();
 
+function log(msg, warn=false){
+  const box = document.getElementById("log");
+  box.innerHTML += (warn ? "<span class='warning'>" : "") + msg + (warn ? "</span>" : "") + "<br>";
+  box.scrollTop = box.scrollHeight;
+}
+
 function parse(expr){
   expr = expr.replaceAll("^","**");
   expr = expr.replace(/sin/g,"Math.sin");
   expr = expr.replace(/cos/g,"Math.cos");
   expr = expr.replace(/tan/g,"Math.tan");
   expr = expr.replace(/e/g,"Math.E");
-
-  if(expr.includes("=")){
-    let [L,R] = expr.split("=");
-    return `${L} - (${R})`;
-  }
   return expr;
 }
 
+function safeEval(expr, x, y){
+  try{
+    let val = eval(expr);
+    if(!isFinite(val)) return null;
+    if(Math.abs(val) > 1e6) return null;
+    return val;
+  }catch{
+    return null;
+  }
+}
+
 function draw(){
-  let input = document.getElementById("expr").value;
+  let input = document.getElementById("expr").value.trim();
   let expr = parse(input);
 
   ctx.clearRect(0,0,cv.width,cv.height);
 
   let scale = 40;
+  let step = 1/scale;
   let threshold = 0.05;
 
-  for(let px=0; px<cv.width; px++){
-    for(let py=0; py<cv.height; py++){
+  log("Draw: " + input);
 
-      let x = (px - cv.width/2)/scale;
-      let y = (cv.height/2 - py)/scale;
+  if(input.length > 40 || input.includes("y") && input.split("y").length > 2){
+    log("⚠️ 식이 너무 복잡해서 부정확할 수 있음", true);
+  }
 
-      let val;
-      try{
-        val = eval(expr);
-      }catch{
-        continue;
-      }
+  // ===== CASE 1: y = f(x)
+  if(input.startsWith("y=") && !input.slice(2).includes("y")){
+    let f = expr.replace("y=","");
 
-      if(!isFinite(val)) continue;
+    for(let x=-10; x<=10; x+=step){
+      let y = safeEval(f, x, 0);
+      if(y===null) continue;
 
-      if(Math.abs(val) < threshold){
-        ctx.fillRect(px,py,1,1);
-      }
+      let px = cv.width/2 + x*scale;
+      let py = cv.height/2 - y*scale;
+
+      ctx.fillRect(px, py, 1, 1);
     }
   }
 
-  log("Drawn: " + input);
+  // ===== CASE 2: x = f(y)
+  else if(input.startsWith("x=")){
+    let f = expr.replace("x=","");
 
-  if(input.length > 30){
-    log("⚠ Equation may be too complex → inaccurate");
+    for(let y=-10; y<=10; y+=step){
+      let x = safeEval(f, 0, y);
+      if(x===null) continue;
+
+      let px = cv.width/2 + x*scale;
+      let py = cv.height/2 - y*scale;
+
+      ctx.fillRect(px, py, 1, 1);
+    }
   }
-}
 
-function log(msg){
-  let box = document.getElementById("info");
-  box.innerHTML += msg + "<br>";
+  // ===== CASE 3: 암시적 그래프 (핵심)
+  else{
+    let f;
+
+    if(input.includes("=")){
+      let [L,R] = expr.split("=");
+      f = `(${L}) - (${R})`;
+    }else{
+      f = expr;
+    }
+
+    for(let px=0; px<cv.width; px++){
+      for(let py=0; py<cv.height; py++){
+
+        let x = (px - cv.width/2)/scale;
+        let y = (cv.height/2 - py)/scale;
+
+        let val = safeEval(f, x, y);
+        if(val===null) continue;
+
+        if(Math.abs(val) < threshold){
+          ctx.fillRect(px, py, 1, 1);
+        }
+      }
+    }
+  }
 }
 </script>
 
