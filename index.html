@@ -458,21 +458,33 @@ linear:{
     title:"Linear Function",
     shape:"A straight line graph.",
     properties:[
-        "Equation form: y=ax+b",
-        "Slope controls direction.",
-        "Rate of change is constant."
+        "Equation form: y=ax+b.",
+        "The slope controls the direction and steepness.",
+        "The rate of change is constant."
     ],
     category:"Algebra → Linear Function"
 },
 
 
+direct:{
+    title:"Direct Proportion",
+    shape:"A straight line passing through the origin.",
+    properties:[
+        "Equation form: y=ax.",
+        "The ratio between x and y stays constant.",
+        "The graph always passes through (0,0)."
+    ],
+    category:"Algebra → Direct Proportion"
+},
+
+
 quadratic:{
     title:"Quadratic Function",
-    shape:"A U-shaped parabola.",
+    shape:"A parabola curve.",
     properties:[
         "Contains x².",
-        "Has a vertex.",
-        "Has symmetry."
+        "Has a vertex (highest or lowest point).",
+        "Has a line of symmetry."
     ],
     category:"Algebra → Quadratic Function"
 },
@@ -484,9 +496,21 @@ cubic:{
     properties:[
         "Contains x³.",
         "Can have turning points.",
-        "Has an inflection point."
+        "Can have an inflection point."
     ],
     category:"Algebra → Cubic Function"
+},
+
+
+polynomial:{
+    title:"Polynomial Function",
+    shape:"A smooth curve made from powers of x.",
+    properties:[
+        "Contains one or more powers of x.",
+        "Can create many different curve shapes.",
+        "Includes linear, quadratic, and cubic functions."
+    ],
+    category:"Algebra → Polynomial Function"
 },
 
 
@@ -495,8 +519,8 @@ sin:{
     shape:"A repeating wave.",
     properties:[
         "Repeats regularly.",
-        "Output is between -1 and 1.",
-        "It is periodic."
+        "The basic range is from -1 to 1.",
+        "It is a periodic function."
     ],
     category:"Trigonometry → Sine"
 },
@@ -504,10 +528,11 @@ sin:{
 
 cos:{
     title:"Cosine Function",
-    shape:"A wave shifted from sine.",
+    shape:"A repeating wave.",
     properties:[
-        "Periodic function.",
-        "Maximum value at x=0."
+        "Similar to sine with a horizontal shift.",
+        "The basic range is from -1 to 1.",
+        "It repeats periodically."
     ],
     category:"Trigonometry → Cosine"
 },
@@ -518,7 +543,8 @@ tan:{
     shape:"Repeating curves with gaps.",
     properties:[
         "Has vertical asymptotes.",
-        "Values can grow very large."
+        "Repeats every π.",
+        "Values become very large near asymptotes."
     ],
     category:"Trigonometry → Tangent"
 },
@@ -528,8 +554,9 @@ sqrt:{
     title:"Square Root Function",
     shape:"Starts at a point and grows slowly.",
     properties:[
-        "Input cannot be negative.",
-        "Growth slows down."
+        "The input cannot be negative.",
+        "Growth becomes slower as x increases.",
+        "The graph has a starting point."
     ],
     category:"Functions → Square Root"
 },
@@ -537,10 +564,11 @@ sqrt:{
 
 absolute:{
     title:"Absolute Value Function",
-    shape:"V-shaped graph.",
+    shape:"A V-shaped graph.",
     properties:[
-        "Negative numbers become positive.",
-        "Has a vertex."
+        "Negative values become positive.",
+        "Has a vertex.",
+        "Creates a symmetric graph."
     ],
     category:"Functions → Absolute Value"
 },
@@ -548,22 +576,35 @@ absolute:{
 
 inverse:{
     title:"Inverse Proportion",
-    shape:"Two separated curves.",
+    shape:"Two separated curved branches.",
     properties:[
-        "Equation: y=a/x",
-        "When x increases, y decreases.",
-        "Has asymptotes."
+        "Equation form: y=a/x.",
+        "The product of x and y stays constant.",
+        "The graph approaches the axes."
     ],
     category:"Algebra → Inverse Proportion"
 },
 
 
+rational:{
+    title:"Rational Function",
+    shape:"A curve separated by gaps.",
+    properties:[
+        "Created by dividing two expressions.",
+        "Can have vertical asymptotes.",
+        "Example: y=(x+1)/(x-2)."
+    ],
+    category:"Algebra → Rational Function"
+},
+
+
 exponential:{
     title:"Exponential Function",
-    shape:"Rapid growth or decay.",
+    shape:"A rapidly growing or decreasing curve.",
     properties:[
-        "Variable is the exponent.",
-        "Used for growth models."
+        "The variable is in the exponent.",
+        "Growth or decay becomes faster over time.",
+        "Used in population and finance models."
     ],
     category:"Functions → Exponential"
 },
@@ -571,16 +612,65 @@ exponential:{
 
 logarithmic:{
     title:"Logarithmic Function",
-    shape:"Slowly increasing curve.",
+    shape:"A slowly increasing curve.",
     properties:[
-        "Inverse of exponential.",
-        "Usually x > 0."
+        "It is the inverse of an exponential function.",
+        "The input must be greater than zero.",
+        "Growth becomes slower as x increases."
     ],
     category:"Functions → Logarithm"
+},
+
+
+circle:{
+    title:"Circle",
+    shape:"A closed round curve.",
+    properties:[
+        "Every point is the same distance from the center.",
+        "Equation form: x²+y²=r².",
+        "It is not a function of x."
+    ],
+    category:"Geometry → Circle"
+},
+
+
+ellipse:{
+    title:"Ellipse",
+    shape:"An oval-shaped curve.",
+    properties:[
+        "A stretched circle shape.",
+        "Has two focus points.",
+        "Used in geometry and astronomy."
+    ],
+    category:"Geometry → Ellipse"
+},
+
+
+hyperbola:{
+    title:"Hyperbola",
+    shape:"Two opposite curved branches.",
+    properties:[
+        "Has asymptotes.",
+        "Often appears in inverse relationships.",
+        "The two sides never meet."
+    ],
+    category:"Geometry → Hyperbola"
+},
+
+
+piecewise:{
+    title:"Piecewise Function",
+    shape:"A graph made from different sections.",
+    properties:[
+        "Uses different rules in different ranges.",
+        "The graph can have breaks.",
+        "Each section follows its own formula."
+    ],
+    category:"Functions → Piecewise Function"
 }
 
-
 };
+
 
 
 
