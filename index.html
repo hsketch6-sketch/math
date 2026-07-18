@@ -4,38 +4,35 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>
- Graph Calculator
-</title>
-
+<title>Graph Calculator</title>
 
 <style>
 
 *{
-    box-sizing:border-box;
+box-sizing:border-box;
 }
-
 
 html,body{
 
-    margin:0;
-    width:100%;
-    height:100%;
+margin:0;
+width:100%;
+height:100%;
 
-    overflow:hidden;
+overflow:hidden;
 
-    font-family:Arial,sans-serif;
+font-family:Arial,sans-serif;
 
 }
 
 
 #container{
 
-    display:flex;
+display:flex;
 
-    width:100vw;
-    height:100vh;
+width:100vw;
+height:100vh;
 
 }
 
@@ -44,13 +41,12 @@ html,body{
 
 #left{
 
-    width:72%;
+width:72%;
 
-    display:flex;
+display:flex;
+flex-direction:column;
 
-    flex-direction:column;
-
-    min-height:0;
+min-height:0;
 
 }
 
@@ -59,33 +55,32 @@ html,body{
 
 #topbar{
 
-    background:#222;
+background:#222;
+color:white;
 
-    color:white;
+padding:12px;
 
-    padding:12px;
-
-    flex-shrink:0;
+flex-shrink:0;
 
 }
 
 
 #input{
 
-    width:300px;
+width:300px;
 
-    padding:8px;
+padding:8px;
 
-    font-size:16px;
+font-size:16px;
 
 }
 
 
-button{
+button,select{
 
-    padding:7px 12px;
+padding:7px 12px;
 
-    cursor:pointer;
+cursor:pointer;
 
 }
 
@@ -95,31 +90,30 @@ button{
 
 #canvasWrap{
 
-    flex:1;
+flex:1;
 
-    min-height:0;
+min-height:0;
 
 }
 
 
 canvas{
 
-    display:block;
+width:100%;
+height:100%;
 
-    width:100%;
+display:block;
 
-    height:100%;
+background:white;
 
-    background:white;
-
-    cursor:grab;
+cursor:grab;
 
 }
 
 
 canvas:active{
 
-    cursor:grabbing;
+cursor:grabbing;
 
 }
 
@@ -129,58 +123,57 @@ canvas:active{
 
 #info{
 
-    height:90px;
+height:90px;
 
-    background:#111;
+background:#111;
 
-    color:#0f0;
+color:#0f0;
 
-    padding:10px;
+padding:10px;
 
-    overflow:auto;
+white-space:pre-line;
 
-    white-space:pre-line;
+overflow:auto;
 
 }
+
 
 
 /* LIST */
 
 #list{
 
-    height:180px;
+height:180px;
 
-    overflow:auto;
+overflow:auto;
 
-    border-top:1px solid #ccc;
+border-top:1px solid #ccc;
 
 }
 
 
 .graphItem{
 
-    padding:10px;
+padding:10px;
 
-    border-bottom:1px solid #ddd;
+border-bottom:1px solid #ddd;
 
 }
-
 
 
 .conceptBox{
 
-    margin-top:10px;
+margin-top:10px;
 
-    padding:10px;
+padding:10px;
 
-    background:#eee;
+background:#eee;
 
-    border-radius:8px;
+border-radius:8px;
 
-    line-height:1.5;
+line-height:1.5;
 
 }
-
 
 
 
@@ -188,46 +181,37 @@ canvas:active{
 
 #right{
 
-    width:28%;
+width:28%;
 
-    background:#f4f4f4;
+background:#f4f4f4;
 
-    padding:15px;
+padding:15px;
 
-    overflow:auto;
+overflow:auto;
 
 }
 
 
 .card{
 
-    background:white;
+background:white;
 
-    padding:15px;
+padding:15px;
 
-    border-radius:12px;
+border-radius:12px;
 
-    margin-bottom:15px;
-
-}
-
-
-
-h2{
-
-    margin-top:0;
+margin-bottom:15px;
 
 }
 
 
 </style>
 
-
 </head>
 
 
-<body>
 
+<body>
 
 
 <div id="container">
@@ -238,7 +222,10 @@ h2{
 
 <div id="topbar">
 
+
+<span id="title">
 📈 Graph Calculator
+</span>
 
 
 <br><br>
@@ -249,12 +236,13 @@ id="input"
 placeholder="Example: y=2x+1">
 
 
-<button onclick="addGraph()">
-
+<button id="addBtn">
 Add
-
 </button>
-<select id="language" onchange="changeLanguage()">
+
+
+
+<select id="language">
 
 <option value="en">
 English
@@ -266,7 +254,9 @@ English
 
 </select>
 
+
 </div>
+
 
 
 
@@ -275,7 +265,6 @@ English
 <canvas id="canvas"></canvas>
 
 </div>
-
 
 
 
@@ -292,9 +281,7 @@ Click graph to check value.
 </div>
 
 
-
 </div>
-
 
 
 
@@ -302,46 +289,37 @@ Click graph to check value.
 <div id="right">
 
 
-<h2>
+<h2 id="guideTitle">
+
 📘 Guide
+
 </h2>
 
 
-
 <div class="card">
 
-<b>
+<b id="exampleTitle">
+
 Input Examples
+
 </b>
 
 <br><br>
 
+
+<div id="examples">
 
 y=x+2
-
 <br>
-
-y=x^2
-
+y=x²
 <br>
-
-y=x^3
-
-<br>
-
 y=sin(x)
-
 <br>
-
 y=1/x
-
 <br>
-
 y=sqrt(x)
 
-<br>
-
-y=abs(x)
+</div>
 
 
 </div>
@@ -352,39 +330,49 @@ y=abs(x)
 <div class="card">
 
 
-<b>
+<b id="controlTitle">
+
 Controls
+
 </b>
 
 
 <br><br>
 
 
-🖱 Drag
+🖱
+<span id="dragText">
+Drag
+</span>
 
 <br>
 
+<span id="moveText">
 Move graph
+</span>
 
 
 <br><br>
 
 
-🖱 Wheel
+🖱
+<span id="wheelText">
+Wheel
+</span>
 
 <br>
 
+<span id="zoomText">
 Zoom
+</span>
 
 
 <br><br>
 
 
-Click
-
-<br>
-
-Show coordinates
+<span id="clickText">
+Click graph to check value.
+</span>
 
 
 </div>
@@ -395,8 +383,10 @@ Show coordinates
 <div class="card">
 
 
-<b>
+<b id="functionTitle">
+
 Functions
+
 </b>
 
 
@@ -404,49 +394,32 @@ Functions
 
 
 sin(x)
-
-→ Wave
+→
+<span id="waveText">
+Wave
+</span>
 
 
 <br><br>
-
 
 cos(x)
 
-→ Wave
-
-
 <br><br>
-
 
 tan(x)
 
-→ Tangent
-
-
 <br><br>
-
 
 sqrt(x)
 
-→ Square root
-
-
 <br><br>
-
 
 abs(x)
 
-→ Absolute value
-
-
 <br><br>
-
 
 log(x)
 
-→ Logarithm
-
 
 </div>
 
@@ -455,316 +428,95 @@ log(x)
 
 
 </div>
+
+
 
 <script>
+
+
 /* =========================
-   CONCEPT DATABASE
+ LANGUAGE SYSTEM
 ========================= */
+
 
 let currentLanguage="en";
-const graphConcepts = {
-const translations={
 
 
-linear:{
+const LANG={
+
+
+en:{
+
+
+title:"📈 Graph Calculator",
+
+add:"Add",
+
+guide:"📘 Guide",
+
+example:"Input Examples",
+
+control:"Controls",
+
+drag:"Drag",
+
+move:"Move graph",
+
+wheel:"Wheel",
+
+zoom:"Zoom",
+
+click:"Click graph to check value.",
+
+function:"Functions",
+
+wave:"Wave",
+
+explain:"Explain",
+
+delete:"Delete",
+
+invalid:"Invalid equation"
+
+},
+
+
+
 ko:{
-title:"일차함수",
-shape:"직선으로 나타나는 그래프입니다.",
-properties:[
-"y=ax+b 형태의 식입니다.",
-"기울기가 방향과 가파른 정도를 결정합니다.",
-"변화율이 일정합니다."
-],
-category:"대수 → 일차함수"
-}
-},
 
 
-quadratic:{
-ko:{
-title:"이차함수",
-shape:"포물선 모양의 그래프입니다.",
-properties:[
-"x² 항을 포함합니다.",
-"꼭짓점을 가집니다.",
-"대칭축을 가집니다."
-],
-category:"대수 → 이차함수"
-}
-},
+title:"📈 그래프 계산기",
 
+add:"추가",
 
-sin:{
-ko:{
-title:"사인 함수",
-shape:"반복되는 파동 모양의 그래프입니다.",
-properties:[
-"일정한 주기로 반복됩니다.",
-"기본 범위는 -1부터 1입니다.",
-"주기 함수입니다."
-],
-category:"삼각함수 → 사인"
-}
-},
+guide:"📘 사용 설명",
 
+example:"입력 예시",
 
-cos:{
-ko:{
-title:"코사인 함수",
-shape:"반복되는 파동 그래프입니다.",
-properties:[
-"사인 함수와 비슷하지만 이동된 형태입니다.",
-"-1부터 1 사이의 값을 가집니다.",
-"주기적으로 반복됩니다."
-],
-category:"삼각함수 → 코사인"
-}
-},
+control:"조작 방법",
 
+drag:"드래그",
 
-tan:{
-ko:{
-title:"탄젠트 함수",
-shape:"끊어진 반복 곡선입니다.",
-properties:[
-"점근선을 가집니다.",
-"주기적으로 반복됩니다.",
-"점근선 근처에서 값이 매우 커집니다."
-],
-category:"삼각함수 → 탄젠트"
-}
-},
+move:"그래프 이동",
 
+wheel:"마우스 휠",
 
-inverse:{
-ko:{
-title:"반비례",
-shape:"두 개의 떨어진 곡선입니다.",
-properties:[
-"y=a/x 형태입니다.",
-"x와 y의 곱은 일정합니다.",
-"축에 가까워지지만 만나지 않습니다."
-],
-category:"대수 → 반비례"
-}
+zoom:"확대 / 축소",
+
+click:"그래프를 클릭하면 값을 확인합니다.",
+
+function:"함수",
+
+wave:"파동",
+
+explain:"설명",
+
+delete:"삭제",
+
+invalid:"올바르지 않은 식입니다."
 
 }
 
-};
-linear:{
-    title:"Linear Function",
-    shape:"A straight line graph.",
-    properties:[
-        "Equation form: y=ax+b.",
-        "The slope controls the direction and steepness.",
-        "The rate of change is constant."
-    ],
-    category:"Algebra → Linear Function"
-},
-
-
-direct:{
-    title:"Direct Proportion",
-    shape:"A straight line passing through the origin.",
-    properties:[
-        "Equation form: y=ax.",
-        "The ratio between x and y stays constant.",
-        "The graph always passes through (0,0)."
-    ],
-    category:"Algebra → Direct Proportion"
-},
-
-
-quadratic:{
-    title:"Quadratic Function",
-    shape:"A parabola curve.",
-    properties:[
-        "Contains x².",
-        "Has a vertex (highest or lowest point).",
-        "Has a line of symmetry."
-    ],
-    category:"Algebra → Quadratic Function"
-},
-
-
-cubic:{
-    title:"Cubic Function",
-    shape:"An S-shaped curve.",
-    properties:[
-        "Contains x³.",
-        "Can have turning points.",
-        "Can have an inflection point."
-    ],
-    category:"Algebra → Cubic Function"
-},
-
-
-polynomial:{
-    title:"Polynomial Function",
-    shape:"A smooth curve made from powers of x.",
-    properties:[
-        "Contains one or more powers of x.",
-        "Can create many different curve shapes.",
-        "Includes linear, quadratic, and cubic functions."
-    ],
-    category:"Algebra → Polynomial Function"
-},
-
-
-sin:{
-    title:"Sine Function",
-    shape:"A repeating wave.",
-    properties:[
-        "Repeats regularly.",
-        "The basic range is from -1 to 1.",
-        "It is a periodic function."
-    ],
-    category:"Trigonometry → Sine"
-},
-
-
-cos:{
-    title:"Cosine Function",
-    shape:"A repeating wave.",
-    properties:[
-        "Similar to sine with a horizontal shift.",
-        "The basic range is from -1 to 1.",
-        "It repeats periodically."
-    ],
-    category:"Trigonometry → Cosine"
-},
-
-
-tan:{
-    title:"Tangent Function",
-    shape:"Repeating curves with gaps.",
-    properties:[
-        "Has vertical asymptotes.",
-        "Repeats every π.",
-        "Values become very large near asymptotes."
-    ],
-    category:"Trigonometry → Tangent"
-},
-
-
-sqrt:{
-    title:"Square Root Function",
-    shape:"Starts at a point and grows slowly.",
-    properties:[
-        "The input cannot be negative.",
-        "Growth becomes slower as x increases.",
-        "The graph has a starting point."
-    ],
-    category:"Functions → Square Root"
-},
-
-
-absolute:{
-    title:"Absolute Value Function",
-    shape:"A V-shaped graph.",
-    properties:[
-        "Negative values become positive.",
-        "Has a vertex.",
-        "Creates a symmetric graph."
-    ],
-    category:"Functions → Absolute Value"
-},
-
-
-inverse:{
-    title:"Inverse Proportion",
-    shape:"Two separated curved branches.",
-    properties:[
-        "Equation form: y=a/x.",
-        "The product of x and y stays constant.",
-        "The graph approaches the axes."
-    ],
-    category:"Algebra → Inverse Proportion"
-},
-
-
-rational:{
-    title:"Rational Function",
-    shape:"A curve separated by gaps.",
-    properties:[
-        "Created by dividing two expressions.",
-        "Can have vertical asymptotes.",
-        "Example: y=(x+1)/(x-2)."
-    ],
-    category:"Algebra → Rational Function"
-},
-
-
-exponential:{
-    title:"Exponential Function",
-    shape:"A rapidly growing or decreasing curve.",
-    properties:[
-        "The variable is in the exponent.",
-        "Growth or decay becomes faster over time.",
-        "Used in population and finance models."
-    ],
-    category:"Functions → Exponential"
-},
-
-
-logarithmic:{
-    title:"Logarithmic Function",
-    shape:"A slowly increasing curve.",
-    properties:[
-        "It is the inverse of an exponential function.",
-        "The input must be greater than zero.",
-        "Growth becomes slower as x increases."
-    ],
-    category:"Functions → Logarithm"
-},
-
-
-circle:{
-    title:"Circle",
-    shape:"A closed round curve.",
-    properties:[
-        "Every point is the same distance from the center.",
-        "Equation form: x²+y²=r².",
-        "It is not a function of x."
-    ],
-    category:"Geometry → Circle"
-},
-
-
-ellipse:{
-    title:"Ellipse",
-    shape:"An oval-shaped curve.",
-    properties:[
-        "A stretched circle shape.",
-        "Has two focus points.",
-        "Used in geometry and astronomy."
-    ],
-    category:"Geometry → Ellipse"
-},
-
-
-hyperbola:{
-    title:"Hyperbola",
-    shape:"Two opposite curved branches.",
-    properties:[
-        "Has asymptotes.",
-        "Often appears in inverse relationships.",
-        "The two sides never meet."
-    ],
-    category:"Geometry → Hyperbola"
-},
-
-
-piecewise:{
-    title:"Piecewise Function",
-    shape:"A graph made from different sections.",
-    properties:[
-        "Uses different rules in different ranges.",
-        "The graph can have breaks.",
-        "Each section follows its own formula."
-    ],
-    category:"Functions → Piecewise Function"
-}
 
 };
 
@@ -772,270 +524,103 @@ piecewise:{
 
 
 
-
-/* =========================
-   FIND CONCEPT
-========================= */
+function applyLanguage(){
 
 
-function getConcept(input){
+let l=LANG[currentLanguage];
 
 
-    let t=input
-    .toLowerCase();
+document.getElementById("title").innerText=l.title;
+
+document.getElementById("addBtn").innerText=l.add;
+
+document.getElementById("guideTitle").innerText=l.guide;
+
+document.getElementById("exampleTitle").innerText=l.example;
+
+document.getElementById("controlTitle").innerText=l.control;
+
+document.getElementById("dragText").innerText=l.drag;
+
+document.getElementById("moveText").innerText=l.move;
+
+document.getElementById("wheelText").innerText=l.wheel;
+
+document.getElementById("zoomText").innerText=l.zoom;
+
+document.getElementById("clickText").innerText=l.click;
+
+document.getElementById("functionTitle").innerText=l.function;
+
+document.getElementById("waveText").innerText=l.wave;
 
 
-    if(t.includes("sin"))
-        return graphConcepts.sin;
+document.getElementById("input").placeholder =
+currentLanguage==="ko"
+?
+"예: y=2x+1"
+:
+"Example: y=2x+1";
 
-
-    if(t.includes("cos"))
-        return graphConcepts.cos;
-
-
-    if(t.includes("tan"))
-        return graphConcepts.tan;
-
-
-    if(t.includes("sqrt"))
-        return graphConcepts.sqrt;
-
-
-    if(t.includes("abs"))
-        return graphConcepts.absolute;
-
-
-    if(t.includes("log"))
-        return graphConcepts.logarithmic;
-
-
-    if(
-        t.includes("1/x") ||
-        t.includes("/x")
-    )
-        return graphConcepts.inverse;
-
-
-    if(
-        t.includes("^3") ||
-        t.includes("x*x*x")
-    )
-        return graphConcepts.cubic;
-
-
-    if(
-        t.includes("^2") ||
-        t.includes("xx")
-    )
-        return graphConcepts.quadratic;
-
-
-    if(
-        t.includes("^") &&
-        !t.includes("x")
-    )
-        return graphConcepts.exponential;
-
-
-    return graphConcepts.linear;
 
 }
 
 
 
+document
+.getElementById("language")
+.addEventListener(
+"change",
+e=>{
 
+currentLanguage=e.target.value;
+
+applyLanguage();
+
+
+});
 
 
 /* =========================
-   FUNCTION TRANSFORMER
+ GRAPH ENGINE
 ========================= */
 
 
-function transform(input){
-
-
-    let expr=input
-    .toLowerCase()
-    .replace(/^y=/,"")
-    .replace(/\s/g,"");
-
-
-
-    /*
-       x² / x³ support
-    */
-
-    expr=expr.replace(
-        /x²/g,
-        "x^2"
-    );
-
-
-    expr=expr.replace(
-        /x³/g,
-        "x^3"
-    );
-
-
-
-    /*
-       xx -> x*x
-    */
-
-    expr=expr.replace(
-        /xx/g,
-        "x*x"
-    );
-
-
-
-    /*
-       powers
-    */
-
-    expr=expr.replace(
-        /\^/g,
-        "**"
-    );
-
-
-
-    /*
-       2x -> 2*x
-    */
-
-expr=expr.replace(
-/(\d+)x/g,
-"$1*x"
-);
-
-
-    /*
-       x(
-       -> x*(
-    */
-
-    expr=expr.replace(
-        /x\(/g,
-        "x*("
-    );
-
-
-    /*
-       )x
-       -> )*x
-    */
-
-    expr=expr.replace(
-        /\)x/g,
-        ")*x"
-    );
-
-
-
-
-    /*
-       Math functions
-    */
-
-    expr=expr.replace(
-        /sin/g,
-        "Math.sin"
-    );
-
-
-    expr=expr.replace(
-        /cos/g,
-        "Math.cos"
-    );
-
-
-    expr=expr.replace(
-        /tan/g,
-        "Math.tan"
-    );
-
-
-    expr=expr.replace(
-        /sqrt/g,
-        "Math.sqrt"
-    );
-
-
-    expr=expr.replace(
-        /abs/g,
-        "Math.abs"
-    );
-
-
-    expr=expr.replace(
-        /log/g,
-        "Math.log"
-    );
-
-
-
-    return expr;
-
-}
-    /* =========================
-   GRAPH ENGINE
-========================= */
-
-
-const canvas =
-document.getElementById("canvas");
-
-const ctx =
-canvas.getContext("2d");
-
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
 
 
 let graphs=[];
-
 let graphID=0;
 
-
-
-/* Camera */
 
 let scale=50;
 
 let originX=0;
-
 let originY=0;
 
 
 
-
-
-/* Resize */
+/* =========================
+ RESIZE
+========================= */
 
 
 function resizeCanvas(){
 
-
-    canvas.width=
-    canvas.clientWidth;
-
-
-    canvas.height=
-    canvas.clientHeight;
+canvas.width=canvas.clientWidth;
+canvas.height=canvas.clientHeight;
 
 
+if(originX===0){
 
-    if(originX===0){
+originX=canvas.width/2;
+originY=canvas.height/2;
 
-        originX=
-        canvas.width/2;
-
-        originY=
-        canvas.height/2;
-
-    }
+}
 
 
-    draw();
+draw();
 
 }
 
@@ -1049,165 +634,202 @@ resizeCanvas
 
 
 
+/* =========================
+ FUNCTION CONVERTER
+========================= */
 
-/* Coordinate Convert */
+
+function transform(input){
 
 
-function worldX(px){
+let expr=input
+.toLowerCase()
+.replace(/^y=/,"")
+.replace(/\s/g,"");
 
-    return(
-        px-originX
-    )/scale;
+
+
+/* powers */
+
+expr=expr.replace(
+/x²/g,
+"x^2"
+);
+
+
+expr=expr.replace(
+/x³/g,
+"x^3"
+);
+
+
+
+expr=expr.replace(
+/\^/g,
+"**"
+);
+
+
+
+/* multiplication */
+
+expr=expr.replace(
+/(\d+)x/g,
+"$1*x"
+);
+
+
+expr=expr.replace(
+/x\(/g,
+"x*("
+);
+
+
+
+/* functions */
+
+
+let funcs=[
+
+"sin",
+"cos",
+"tan",
+"sqrt",
+"abs",
+"log",
+"exp",
+"floor",
+"ceil",
+"round",
+"asin",
+"acos",
+"atan"
+
+];
+
+
+funcs.forEach(f=>{
+
+expr=expr.replace(
+new RegExp(f,"g"),
+"Math."+f
+);
+
+});
+
+
+return expr;
+
 
 }
 
 
-
-function worldY(py){
-
-    return(
-        originY-py
-    )/scale;
-
-}
 
 
 
 
 
 /* =========================
-   ADD GRAPH
+ ADD GRAPH
 ========================= */
 
 
 function addGraph(){
 
 
-    let input=
-    document.getElementById("input")
-    .value;
+let input=
+document.getElementById("input").value;
 
 
-    if(!input)
-        return;
-
-
-
-    let expr=
-    transform(input);
+if(!input)
+return;
 
 
 
-    let func;
-
-
-    try{
-
-
-        func=new Function(
-            "x",
-            "return "+expr
-        );
-
-
-        let test=
-        func(1);
+let expr=
+transform(input);
 
 
 
-        if(typeof test!=="number")
-            throw Error();
+let func;
 
 
-    }
-
-    catch{
-
-        alert(
-        "Invalid equation"
-        );
-
-        return;
-
-    }
+try{
 
 
+func=new Function(
+"x",
+"return "+expr
+);
 
 
-
-    let id=graphID;
-
+let test=func(1);
 
 
-    graphs.push({
-
-        id:id,
-
-        input:input,
-
-        f:func,
-
-        color:
-        `hsl(${id*70%360},70%,50%)`
-
-    });
-
-
-
-
-
-    createGraphItem(
-        id,
-        input
-     let key;
-
-
-if(concept===graphConcepts.linear)
-key="linear";
-
-else if(concept===graphConcepts.quadratic)
-key="quadratic";
-
-else if(concept===graphConcepts.sin)
-key="sin";
-
-else if(concept===graphConcepts.cos)
-key="cos";
-
-else if(concept===graphConcepts.tan)
-key="tan";
-
-else if(concept===graphConcepts.inverse)
-key="inverse";
-
-
-
-if(
-currentLanguage==="ko"
+if(typeof test!=="number"
 &&
-translations[key]
-){
+!Number.isNaN(test)
+)
+throw Error();
 
-concept=
-translations[key].ko;
 
 }
-    );
+
+catch{
 
 
+alert(
+LANG[currentLanguage].invalid
+);
 
-    graphID++;
-
-
-    document.getElementById("input")
-    .value="";
-
-
-    draw();
+return;
 
 }
 
 
+
+
+let id=graphID;
+
+
+graphs.push({
+
+id:id,
+
+input:input,
+
+f:func,
+
+color:
+`hsl(${id*80%360},70%,50%)`
+
+});
+
+
+
+createGraphItem(
+id,
+input
+);
+
+
+
+graphID++;
+
+
+document.getElementById("input").value="";
+
+
+draw();
+
+
+}
+
+
+
+document
+.getElementById("addBtn")
+.onclick=addGraph;
 
 
 
@@ -1215,29 +837,20 @@ translations[key].ko;
 
 
 /* =========================
-   GRAPH LIST UI
+ GRAPH LIST
 ========================= */
 
 
-function createGraphItem(
-id,
-input
-){
+function createGraphItem(id,input){
 
 
-let concept=
-getConcept(input);
-
-
-
-let div=
-document.createElement("div");
+let div=document.createElement("div");
 
 
 div.className="graphItem";
 
-div.id=
-"graph"+id;
+
+div.id="graph"+id;
 
 
 
@@ -1249,89 +862,13 @@ div.innerHTML=`
 
 ${input}
 
-<br>
-
-<small>
-${concept.title}
-</small>
-
-
 <br><br>
-
-
-<button onclick="toggleConcept(${id})">
-
-Explain
-
-</button>
-
 
 <button onclick="removeGraph(${id})">
 
 ❌
 
 </button>
-
-
-
-<div
-class="conceptBox"
-id="concept${id}"
-style="display:none">
-
-<b>
-${concept.title}
-</b>
-
-
-<br><br>
-
-
-<b>
-Shape:
-</b>
-
-<br>
-
-${concept.shape}
-
-
-
-<br><br>
-
-
-<b>
-Properties:
-</b>
-
-
-<br>
-
-
-${
-concept.properties
-.map(
-p=>"• "+p
-)
-.join("<br>")
-}
-
-
-
-<br><br>
-
-
-<b>
-Category:
-</b>
-
-<br>
-
-${concept.category}
-
-
-</div>
-
 
 `;
 
@@ -1347,32 +884,6 @@ document
 
 
 
-
-function toggleConcept(id){
-
-
-let box=
-document.getElementById(
-"concept"+id
-);
-
-
-
-box.style.display=
-box.style.display==="none"
-?
-"block"
-:
-"none";
-
-
-}
-
-
-
-
-
-
 function removeGraph(id){
 
 
@@ -1380,7 +891,6 @@ graphs=
 graphs.filter(
 g=>g.id!==id
 );
-
 
 
 let item=
@@ -1393,8 +903,36 @@ if(item)
 item.remove();
 
 
-
 draw();
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+ COORDINATE
+========================= */
+
+
+function worldX(px){
+
+return(
+px-originX
+)/scale;
+
+}
+
+
+function worldY(py){
+
+return(
+originY-py
+)/scale;
 
 }
 
@@ -1405,22 +943,17 @@ draw();
 
 
 
-
 /* =========================
-   AXIS
+ AXIS
 ========================= */
 
 
 function drawAxis(){
 
 
-ctx.strokeStyle="#bbb";
+ctx.strokeStyle="#ccc";
 
 ctx.lineWidth=1;
-
-
-
-/* Axis */
 
 
 ctx.beginPath();
@@ -1455,80 +988,55 @@ ctx.stroke();
 
 
 
-
-
-
-/* Grid numbers */
-
-
 ctx.fillStyle="#555";
 
 ctx.font="12px Arial";
 
 
-
-let step=1;
-
-
-
-if(scale<30)
-step=5;
-
-
-if(scale>120)
-step=0.5;
-
-
-
-
 for(
-let i=-100;
-i<=100;
-i+=step
+let i=-50;
+i<=50;
+i++
 ){
 
 
-let px=
+let x=
 originX+i*scale;
 
 
-let py=
+let y=
 originY-i*scale;
 
 
-
 if(
-px>0 &&
-px<canvas.width
+x>0 &&
+x<canvas.width
 )
 
 ctx.fillText(
-Number(i.toFixed(2)),
-px,
+i,
+x,
 originY+15
 );
 
 
 
 if(
-py>0 &&
-py<canvas.height
+y>0 &&
+y<canvas.height
 )
 
 ctx.fillText(
-Number(i.toFixed(2)),
+i,
 originX+5,
-py
+y
 );
 
 
-
 }
 
 
-
 }
-
 
 
 
@@ -1536,20 +1044,17 @@ py
 
 
 /* =========================
-   DRAW GRAPHS
+ DRAW GRAPH
 ========================= */
 
 
 function drawGraphs(){
 
 
-
 graphs.forEach(g=>{
 
 
-ctx.strokeStyle=
-g.color;
-
+ctx.strokeStyle=g.color;
 
 ctx.lineWidth=2;
 
@@ -1559,9 +1064,6 @@ ctx.beginPath();
 
 
 let started=false;
-
-let lastY=null;
-
 
 
 
@@ -1579,7 +1081,6 @@ worldX(px);
 let y;
 
 
-
 try{
 
 y=g.f(x);
@@ -1589,7 +1090,6 @@ y=g.f(x);
 catch{
 
 started=false;
-
 continue;
 
 }
@@ -1604,24 +1104,7 @@ Math.abs(y)>10000
 ){
 
 started=false;
-
 continue;
-
-}
-
-
-
-
-/*
-  Prevent wrong connections
-*/
-
-if(
-lastY!==null &&
-Math.abs(y-lastY)>50
-){
-
-started=false;
 
 }
 
@@ -1654,10 +1137,8 @@ py
 
 
 
-lastY=y;
-
-
 }
+
 
 
 ctx.stroke();
@@ -1665,6 +1146,7 @@ ctx.stroke();
 
 });
 
+
 }
 
 
@@ -1672,8 +1154,10 @@ ctx.stroke();
 
 
 
+
+
 /* =========================
-   MAIN DRAW
+ DRAW
 ========================= */
 
 
@@ -1694,15 +1178,21 @@ drawGraphs();
 
 
 }
+
+
+
+
+
+
+
 /* =========================
-   DRAG MOVE
+ DRAG
 ========================= */
 
 
 let dragging=false;
 
 let lastX=0;
-
 let lastY=0;
 
 
@@ -1711,18 +1201,12 @@ canvas.addEventListener(
 "mousedown",
 e=>{
 
-
 dragging=true;
 
-
 lastX=e.clientX;
-
 lastY=e.clientY;
 
-
-
 });
-
 
 
 
@@ -1730,12 +1214,9 @@ window.addEventListener(
 "mouseup",
 ()=>{
 
-
 dragging=false;
 
-
 });
-
 
 
 
@@ -1748,7 +1229,6 @@ if(!dragging)
 return;
 
 
-
 originX+=
 e.clientX-lastX;
 
@@ -1759,9 +1239,7 @@ e.clientY-lastY;
 
 
 lastX=e.clientX;
-
 lastY=e.clientY;
-
 
 
 draw();
@@ -1776,7 +1254,7 @@ draw();
 
 
 /* =========================
-   ZOOM
+ ZOOM
 ========================= */
 
 
@@ -1788,21 +1266,14 @@ e=>{
 e.preventDefault();
 
 
-
-let oldScale=
-scale;
-
+let old=scale;
 
 
 if(e.deltaY<0)
-
 scale*=1.1;
 
-
 else
-
 scale/=1.1;
-
 
 
 
@@ -1816,19 +1287,8 @@ scale
 
 
 
-
-/*
- Keep mouse position
- */
-
-
-let mx=
-e.offsetX;
-
-
-let my=
-e.offsetY;
-
+let mx=e.offsetX;
+let my=e.offsetY;
 
 
 
@@ -1836,8 +1296,7 @@ originX=
 mx-
 (mx-originX)
 *
-(scale/oldScale);
-
+(scale/old);
 
 
 
@@ -1845,13 +1304,11 @@ originY=
 my-
 (my-originY)
 *
-(scale/oldScale);
-
+(scale/old);
 
 
 
 draw();
-
 
 
 },
@@ -1866,11 +1323,8 @@ passive:false
 
 
 
-
-
-
 /* =========================
-   CLICK VALUE CHECK
+ CLICK VALUE
 ========================= */
 
 
@@ -1886,12 +1340,8 @@ worldX(e.offsetX);
 
 let text=
 "x = "
-+
-x.toFixed(3)
-+
-"\n\n";
-
-
++x.toFixed(3)
++"\n\n";
 
 
 
@@ -1899,7 +1349,6 @@ graphs.forEach(g=>{
 
 
 let y;
-
 
 
 try{
@@ -1916,32 +1365,24 @@ return;
 
 
 
-
-if(
-Number.isFinite(y)
-){
+if(Number.isFinite(y)){
 
 
 text+=
 g.input
-+
-"\n";
++"\n";
 
 
 text+=
 "y = "
-+
-y.toFixed(4)
-+
-"\n\n";
++y.toFixed(4)
++"\n\n";
 
 
 }
 
 
 });
-
-
 
 
 
@@ -1957,30 +1398,377 @@ document
 
 
 
+resizeCanvas();
+ /* =========================
+ CONCEPT DATABASE
+========================= */
+
+
+const concepts={
+
+
+linear:{
+
+title:{
+en:"Linear Function",
+ko:"일차함수"
+},
+
+shape:{
+en:"A straight line graph.",
+ko:"직선으로 나타나는 그래프입니다."
+},
+
+info:{
+
+en:[
+"Form: y=ax+b",
+"The slope controls direction.",
+"Change rate is constant."
+],
+
+ko:[
+"형태: y=ax+b",
+"기울기가 방향을 결정합니다.",
+"변화율이 일정합니다."
+]
+
+}
+
+},
+
+
+
+quadratic:{
+
+title:{
+en:"Quadratic Function",
+ko:"이차함수"
+},
+
+shape:{
+en:"A parabola curve.",
+ko:"포물선 모양입니다."
+},
+
+info:{
+
+en:[
+"Contains x².",
+"Has a vertex.",
+"Has symmetry."
+],
+
+ko:[
+"x² 항을 포함합니다.",
+"꼭짓점을 가집니다.",
+"대칭축이 있습니다."
+]
+
+}
+
+},
+
+
+
+sin:{
+
+title:{
+en:"Sine Function",
+ko:"사인 함수"
+},
+
+shape:{
+en:"A repeating wave.",
+ko:"반복되는 파동 그래프입니다."
+},
+
+info:{
+
+en:[
+"Periodic function.",
+"Range is -1 to 1."
+],
+
+ko:[
+"주기 함수입니다.",
+"기본 범위는 -1~1입니다."
+]
+
+}
+
+},
+
+
+
+circle:{
+
+title:{
+en:"Circle",
+ko:"원"
+},
+
+shape:{
+en:"A closed round curve.",
+ko:"닫힌 원형 그래프입니다."
+},
+
+info:{
+
+en:[
+"Equation: x²+y²=r²",
+"All points are same distance from center."
+],
+
+ko:[
+"식: x²+y²=r²",
+"중심에서 같은 거리에 있는 점들의 모임입니다."
+]
+
+}
+
+},
+
+
+
+inverse:{
+
+title:{
+en:"Inverse Proportion",
+ko:"반비례"
+},
+
+shape:{
+en:"Two separated curves.",
+ko:"서로 떨어진 두 곡선입니다."
+},
+
+info:{
+
+en:[
+"Form: y=a/x",
+"x*y is constant."
+],
+
+ko:[
+"형태: y=a/x",
+"x와 y의 곱이 일정합니다."
+]
+
+}
+
+}
+
+
+};
+
+
+
 
 
 
 
 /* =========================
-   ENTER KEY
+ FIND CONCEPT
 ========================= */
 
 
-document
-.getElementById("input")
-.addEventListener(
-"keydown",
-e=>{
+function getConcept(input){
 
 
-if(e.key==="Enter"){
+let t=input
+.toLowerCase();
 
-addGraph();
+
+
+if(
+t.includes("sin")
+)
+
+return concepts.sin;
+
+
+
+if(
+t.includes("x²+y²")
+||
+(
+t.includes("x^2+y^2")
+)
+)
+
+return concepts.circle;
+
+
+
+if(
+t.includes("/x")
+||
+t.includes("1/x")
+)
+
+return concepts.inverse;
+
+
+
+if(
+t.includes("x²")
+||
+t.includes("x^2")
+)
+
+return concepts.quadratic;
+
+
+
+return concepts.linear;
+
 
 }
 
 
-});
+
+
+
+
+
+/* =========================
+ UPDATE GRAPH LIST
+========================= */
+
+
+function createGraphItem(id,input){
+
+
+let c=getConcept(input);
+
+
+
+let div=
+document.getElementById(
+"graph"+id
+);
+
+
+
+if(div)
+div.remove();
+
+
+
+div=document.createElement("div");
+
+
+div.className="graphItem";
+
+div.id="graph"+id;
+
+
+
+let lang=currentLanguage;
+
+
+
+div.innerHTML=`
+
+<b>
+#${id}
+</b>
+
+${input}
+
+<br>
+
+
+<small>
+
+${c.title[lang]}
+
+</small>
+
+
+<br><br>
+
+
+<button onclick="showConcept(${id})">
+
+${LANG[lang].explain}
+
+</button>
+
+
+<button onclick="removeGraph(${id})">
+
+❌
+
+</button>
+
+
+<div
+id="concept${id}"
+class="conceptBox"
+style="display:none">
+
+<b>
+
+${c.title[lang]}
+
+</b>
+
+
+<br><br>
+
+
+${c.shape[lang]}
+
+
+<br><br>
+
+
+${
+c.info[lang]
+.map(x=>"• "+x)
+.join("<br>")
+}
+
+
+</div>
+
+
+`;
+
+
+
+document
+.getElementById("list")
+.appendChild(div);
+
+
+}
+
+
+
+
+
+
+function showConcept(id){
+
+
+let box=
+document.getElementById(
+"concept"+id
+);
+
+
+box.style.display=
+box.style.display==="none"
+?
+"block"
+:
+"none";
+
+
+}
 
 
 
@@ -1988,16 +1776,22 @@ addGraph();
 
 
 
+/* =========================
+ LANGUAGE REFRESH
+========================= */
 
 
-/* START */
-
-resizeCanvas();
- function changeLanguage(){
+function changeLanguage(){
 
 
 currentLanguage=
-document.getElementById("language").value;
+document
+.getElementById("language")
+.value;
+
+
+
+applyLanguage();
 
 
 
@@ -2019,7 +1813,33 @@ g.input
 
 
 }
-    </script>
+
+
+
+
+
+
+/* =========================
+ ENTER KEY
+========================= */
+
+
+document
+.getElementById("input")
+.addEventListener(
+"keydown",
+e=>{
+
+
+if(e.key==="Enter")
+addGraph();
+
+
+});
+
+</script>
+
 
 </body>
+
 </html>
