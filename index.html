@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
@@ -19,6 +20,7 @@ Educational Graph Calculator
 html,body{
 
     margin:0;
+    width:100%;
     height:100%;
 
     overflow:hidden;
@@ -28,26 +30,21 @@ html,body{
 }
 
 
-
 #container{
 
     display:flex;
 
     width:100vw;
-
     height:100vh;
 
 }
 
 
-
-/* LEFT AREA */
+/* LEFT */
 
 #left{
 
-    width:70%;
-
-    height:100%;
+    width:72%;
 
     display:flex;
 
@@ -58,7 +55,6 @@ html,body{
 }
 
 
-
 /* TOP */
 
 #topbar{
@@ -67,27 +63,27 @@ html,body{
 
     color:white;
 
-    padding:10px;
+    padding:12px;
 
     flex-shrink:0;
 
 }
 
 
-
 #input{
 
-    width:260px;
+    width:300px;
 
-    padding:6px;
+    padding:8px;
 
-    font-size:15px;
+    font-size:16px;
 
 }
 
 
-
 button{
+
+    padding:7px 12px;
 
     cursor:pointer;
 
@@ -95,7 +91,7 @@ button{
 
 
 
-/* GRAPH */
+/* CANVAS */
 
 #canvasWrap{
 
@@ -106,14 +102,13 @@ button{
 }
 
 
-
 canvas{
+
+    display:block;
 
     width:100%;
 
     height:100%;
-
-    display:block;
 
     background:white;
 
@@ -130,16 +125,11 @@ canvas:active{
 
 
 
-
 /* INFO */
 
 #info{
 
-    height:100px;
-
-    flex-shrink:0;
-
-    overflow:auto;
+    height:90px;
 
     background:#111;
 
@@ -147,29 +137,29 @@ canvas:active{
 
     padding:10px;
 
+    overflow:auto;
+
+    white-space:pre-line;
+
 }
 
 
-
-/* GRAPH LIST */
+/* LIST */
 
 #list{
 
-    height:170px;
+    height:180px;
 
     overflow:auto;
-
-    flex-shrink:0;
 
     border-top:1px solid #ccc;
 
 }
 
 
-
 .graphItem{
 
-    padding:8px;
+    padding:10px;
 
     border-bottom:1px solid #ddd;
 
@@ -179,11 +169,11 @@ canvas:active{
 
 .conceptBox{
 
-    margin-top:8px;
+    margin-top:10px;
 
     padding:10px;
 
-    background:#eeeeee;
+    background:#eee;
 
     border-radius:8px;
 
@@ -194,43 +184,46 @@ canvas:active{
 
 
 
-
 /* RIGHT */
 
 #right{
 
-    width:30%;
-
-    height:100%;
-
-    overflow:auto;
+    width:28%;
 
     background:#f4f4f4;
 
     padding:15px;
 
-}
+    overflow:auto;
 
+}
 
 
 .card{
 
     background:white;
 
-    padding:12px;
+    padding:15px;
+
+    border-radius:12px;
 
     margin-bottom:15px;
-
-    border-radius:10px;
 
 }
 
 
 
+h2{
+
+    margin-top:0;
+
+}
+
+
 </style>
 
-</head>
 
+</head>
 
 
 <body>
@@ -240,7 +233,6 @@ canvas:active{
 <div id="container">
 
 
-
 <div id="left">
 
 
@@ -248,11 +240,13 @@ canvas:active{
 
 📈 Educational Graph Calculator
 
+
 <br><br>
 
 
-<input id="input"
-placeholder="Example: y=sin(x)">
+<input
+id="input"
+placeholder="Example: y=2x+1">
 
 
 <button onclick="addGraph()">
@@ -274,9 +268,10 @@ Add
 
 
 
+
 <div id="info">
 
-Click the graph to see values.
+Click graph to check value.
 
 </div>
 
@@ -305,11 +300,22 @@ Click the graph to see values.
 
 <div class="card">
 
-<b>Input Examples</b>
+<b>
+Input Examples
+</b>
 
 <br><br>
 
+
+y=x+2
+
+<br>
+
 y=x^2
+
+<br>
+
+y=x^3
 
 <br>
 
@@ -325,15 +331,24 @@ y=sqrt(x)
 
 <br>
 
+y=abs(x)
+
+
 </div>
+
 
 
 
 <div class="card">
 
-<b>Controls</b>
+
+<b>
+Controls
+</b>
+
 
 <br><br>
+
 
 🖱 Drag
 
@@ -341,7 +356,9 @@ y=sqrt(x)
 
 Move graph
 
+
 <br><br>
+
 
 🖱 Wheel
 
@@ -349,510 +366,236 @@ Move graph
 
 Zoom
 
+
+<br><br>
+
+
+Click
+
+<br>
+
+Show coordinates
+
+
 </div>
+
 
 
 
 <div class="card">
 
-<b>Functions</b>
+
+<b>
+Functions
+</b>
+
 
 <br><br>
+
 
 sin(x)
 
-→ Sine wave
+→ Wave
+
 
 <br><br>
+
 
 cos(x)
 
-→ Cosine wave
+→ Wave
+
 
 <br><br>
+
 
 tan(x)
 
 → Tangent
 
+
 <br><br>
+
 
 sqrt(x)
 
 → Square root
 
+
 <br><br>
+
 
 abs(x)
 
 → Absolute value
 
+
+<br><br>
+
+
+log(x)
+
+→ Logarithm
+
+
 </div>
 
 
-
 </div>
 
 
 </div>
-
-
-
-
 
 <script>
+/* =========================
+   CONCEPT DATABASE
+========================= */
 
 
 const graphConcepts = {
 
-
-sin:{
-
-title:"Sine Function",
-
-shape:
-"It is a smooth wave that repeats regularly.",
-
-properties:[
-
-"The output value is between -1 and 1.",
-
-"It is a periodic function.",
-
-"The pattern repeats forever."
-
-],
-
-category:
-"Trigonometry → Sine Function"
-
-},
-
-
-
-cos:{
-
-title:"Cosine Function",
-
-shape:
-"It is a wave similar to sine but shifted.",
-
-properties:[
-
-"The output value is between -1 and 1.",
-
-"It is periodic.",
-
-"It starts at its maximum value when x=0."
-
-],
-
-category:
-"Trigonometry → Cosine Function"
-
-},
-
-
-
-tan:{
-
-title:"Tangent Function",
-
-shape:
-"It has repeating curves with gaps.",
-
-properties:[
-
-"It has vertical asymptotes.",
-
-"The value can become extremely large."
-
-],
-
-category:
-"Trigonometry → Tangent Function"
-
-},
-
-
-
-quadratic:{
-
-title:"Quadratic Function",
-
-shape:
-"It creates a U-shaped parabola.",
-
-properties:[
-
-"It has a vertex.",
-
-"It is symmetric.",
-
-"The coefficient changes the direction."
-
-],
-
-category:
-"Functions → Quadratic Function"
-
-},
-
-
-
 linear:{
-
-title:"Linear Function",
-
-shape:
-"It creates a straight line.",
-
-properties:[
-
-"The slope controls steepness.",
-
-"It has a constant rate of change."
-
-],
-
-category:
-"Functions → Linear Function"
-
-},
-
-
-
-inverse:{
-
-title:"Inverse Function",
-
-shape:
-"It creates two separated curves.",
-
-properties:[
-
-"It approaches the axes.",
-
-"It represents inverse relationships."
-
-],
-
-category:
-"Functions → Inverse Proportion"
-
-},
-
-
-
-sqrt:{
-
-title:"Square Root Function",
-
-shape:
-"It starts from zero and grows slowly.",
-
-properties:[
-
-"The input cannot be negative.",
-
-"The growth becomes slower."
-
-],
-
-category:
-"Functions → Square Root Function"
-
-},
-
-
-
-absolute:{
-
-title:"Absolute Value Function",
-
-shape:
-"It creates a V-shaped graph.",
-
-properties:[
-
-"Negative values become positive.",
-
-"It has a vertex."
-
-],
-
-category:
-"Functions → Absolute Value Function"
-
-}
-direct:{
-    title:"Direct Proportion (정비례)",
-
-    shape:
-    "It is a straight line passing through the origin.",
-
+    title:"Linear Function",
+    shape:"A straight line graph.",
     properties:[
-        "The graph always passes through (0,0).",
-        "y changes at a constant ratio with x.",
-        "The equation is y=ax."
+        "Equation form: y=ax+b",
+        "Slope controls direction.",
+        "Rate of change is constant."
     ],
-
-    category:
-    "Algebra → Direct Proportion"
-},
-
-
-inverse:{
-    title:"Inverse Proportion (반비례)",
-
-    shape:
-    "It creates two separated curved branches.",
-
-    properties:[
-        "The equation is y=a/x.",
-        "When x increases, y decreases.",
-        "The graph has asymptotes."
-    ],
-
-    category:
-    "Algebra → Inverse Proportion"
-},
-
-
-linear:{
-    title:"Linear Function (1st Degree Function)",
-
-    shape:
-    "It creates a straight line.",
-
-    properties:[
-        "The equation is y=ax+b.",
-        "The slope controls the direction.",
-        "The rate of change is constant."
-    ],
-
-    category:
-    "Algebra → Linear Function"
+    category:"Algebra → Linear Function"
 },
 
 
 quadratic:{
-    title:"Quadratic Function (2nd Degree Function)",
-
-    shape:
-    "It creates a parabola.",
-
+    title:"Quadratic Function",
+    shape:"A U-shaped parabola.",
     properties:[
-        "It has a vertex.",
-        "It has an axis of symmetry.",
-        "The equation contains x²."
+        "Contains x².",
+        "Has a vertex.",
+        "Has symmetry."
     ],
-
-    category:
-    "Algebra → Quadratic Function"
+    category:"Algebra → Quadratic Function"
 },
 
 
 cubic:{
-    title:"Cubic Function (3rd Degree Function)",
-
-    shape:
-    "It creates an S-shaped curve.",
-
+    title:"Cubic Function",
+    shape:"An S-shaped curve.",
     properties:[
-        "The equation contains x³.",
-        "It can have a turning point.",
-        "It may have an inflection point."
+        "Contains x³.",
+        "Can have turning points.",
+        "Has an inflection point."
     ],
-
-    category:
-    "Algebra → Cubic Function"
+    category:"Algebra → Cubic Function"
 },
 
 
-absolute:{
-    title:"Absolute Value Function",
-
-    shape:
-    "It creates a V-shaped graph.",
-
+sin:{
+    title:"Sine Function",
+    shape:"A repeating wave.",
     properties:[
-        "Negative values become positive.",
-        "It has a vertex."
+        "Repeats regularly.",
+        "Output is between -1 and 1.",
+        "It is periodic."
     ],
+    category:"Trigonometry → Sine"
+},
 
-    category:
-    "Functions → Absolute Value"
+
+cos:{
+    title:"Cosine Function",
+    shape:"A wave shifted from sine.",
+    properties:[
+        "Periodic function.",
+        "Maximum value at x=0."
+    ],
+    category:"Trigonometry → Cosine"
+},
+
+
+tan:{
+    title:"Tangent Function",
+    shape:"Repeating curves with gaps.",
+    properties:[
+        "Has vertical asymptotes.",
+        "Values can grow very large."
+    ],
+    category:"Trigonometry → Tangent"
 },
 
 
 sqrt:{
     title:"Square Root Function",
-
-    shape:
-    "It starts at a point and curves outward.",
-
+    shape:"Starts at a point and grows slowly.",
     properties:[
-        "The input cannot be negative.",
-        "The graph has a starting point."
+        "Input cannot be negative.",
+        "Growth slows down."
     ],
+    category:"Functions → Square Root"
+},
 
-    category:
-    "Functions → Square Root"
+
+absolute:{
+    title:"Absolute Value Function",
+    shape:"V-shaped graph.",
+    properties:[
+        "Negative numbers become positive.",
+        "Has a vertex."
+    ],
+    category:"Functions → Absolute Value"
+},
+
+
+inverse:{
+    title:"Inverse Proportion",
+    shape:"Two separated curves.",
+    properties:[
+        "Equation: y=a/x",
+        "When x increases, y decreases.",
+        "Has asymptotes."
+    ],
+    category:"Algebra → Inverse Proportion"
 },
 
 
 exponential:{
     title:"Exponential Function",
-
-    shape:
-    "It grows or decreases very quickly.",
-
+    shape:"Rapid growth or decay.",
     properties:[
-        "The variable is the exponent.",
-        "Used for growth and decay."
+        "Variable is the exponent.",
+        "Used for growth models."
     ],
-
-    category:
-    "Functions → Exponential"
+    category:"Functions → Exponential"
 },
 
 
 logarithmic:{
     title:"Logarithmic Function",
-
-    shape:
-    "It increases slowly.",
-
+    shape:"Slowly increasing curve.",
     properties:[
-        "It is the inverse of exponential functions.",
-        "The domain is usually x>0."
+        "Inverse of exponential.",
+        "Usually x > 0."
     ],
-
-    category:
-    "Functions → Logarithmic"
-},
-
-
-trigonometric:{
-    title:"Trigonometric Function",
-
-    shape:
-    "It creates repeating waves.",
-
-    properties:[
-        "It has periodic behavior.",
-        "Examples are sin, cos, tan."
-    ],
-
-    category:
-    "Trigonometry"
-},
-
-
-circle:{
-    title:"Circle",
-
-    shape:
-    "It creates a closed round shape.",
-
-    properties:[
-        "Every point has the same distance from the center.",
-        "Equation: x²+y²=r²."
-    ],
-
-    category:
-    "Geometry → Circle"
-},
-
-
-ellipse:{
-    title:"Ellipse",
-
-    shape:
-    "It creates an oval shape.",
-
-    properties:[
-        "It has two focus points.",
-        "It is stretched from a circle."
-    ],
-
-    category:
-    "Geometry → Ellipse"
-},
-
-
-hyperbola:{
-    title:"Hyperbola",
-
-    shape:
-    "It creates two opposite curves.",
-
-    properties:[
-        "It has asymptotes.",
-        "It appears in many inverse relationships."
-    ],
-
-    category:
-    "Geometry → Hyperbola"
+    category:"Functions → Logarithm"
 }
 
 
 };
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-
-
-let graphs=[];
-let graphID=0;
-
-
-
-/* Camera */
-
-let scale=50;
-
-let originX=0;
-let originY=0;
-
-
-
-
-/* Resize */
-
-function resizeCanvas(){
-
-    canvas.width=canvas.clientWidth;
-    canvas.height=canvas.clientHeight;
-
-
-    if(originX===0){
-
-        originX=canvas.width/2;
-        originY=canvas.height/2;
-
-    }
-
-
-    draw();
-
-}
-
-
-window.addEventListener(
-"resize",
-resizeCanvas
-);
 
 
 
 
 
-/* Find Concept */
+/* =========================
+   FIND CONCEPT
+========================= */
+
 
 function getConcept(input){
 
-    let t=input.toLowerCase();
+
+    let t=input
+    .toLowerCase();
 
 
     if(t.includes("sin"))
@@ -867,23 +610,44 @@ function getConcept(input){
         return graphConcepts.tan;
 
 
-    if(
-        t.includes("xx") ||
-        t.includes("^2")
-    )
-        return graphConcepts.quadratic;
-
-
-    if(t.includes("1/x"))
-        return graphConcepts.inverse;
-
-
     if(t.includes("sqrt"))
         return graphConcepts.sqrt;
 
 
     if(t.includes("abs"))
         return graphConcepts.absolute;
+
+
+    if(t.includes("log"))
+        return graphConcepts.logarithmic;
+
+
+    if(
+        t.includes("1/x") ||
+        t.includes("/x")
+    )
+        return graphConcepts.inverse;
+
+
+    if(
+        t.includes("^3") ||
+        t.includes("x*x*x")
+    )
+        return graphConcepts.cubic;
+
+
+    if(
+        t.includes("^2") ||
+        t.includes("xx")
+    )
+        return graphConcepts.quadratic;
+
+
+    if(
+        t.includes("^") &&
+        !t.includes("x")
+    )
+        return graphConcepts.exponential;
 
 
     return graphConcepts.linear;
@@ -895,10 +659,13 @@ function getConcept(input){
 
 
 
-/* Convert Input */
+/* =========================
+   FUNCTION TRANSFORMER
+========================= */
 
 
 function transform(input){
+
 
     let expr=input
     .toLowerCase()
@@ -907,11 +674,37 @@ function transform(input){
 
 
 
+    /*
+       x² / x³ support
+    */
+
     expr=expr.replace(
-        /xx/g,
-        "(x*x)"
+        /x²/g,
+        "x^2"
     );
 
+
+    expr=expr.replace(
+        /x³/g,
+        "x^3"
+    );
+
+
+
+    /*
+       xx -> x*x
+    */
+
+    expr=expr.replace(
+        /xx/g,
+        "x*x"
+    );
+
+
+
+    /*
+       powers
+    */
 
     expr=expr.replace(
         /\^/g,
@@ -919,12 +712,44 @@ function transform(input){
     );
 
 
+
+    /*
+       2x -> 2*x
+    */
+
+expr=expr.replace(
+/(\d+)x/g,
+"$1*x"
+);
+
+
+    /*
+       x(
+       -> x*(
+    */
+
     expr=expr.replace(
-        /(\d)x/g,
-        "$1*x"
+        /x\(/g,
+        "x*("
     );
 
 
+    /*
+       )x
+       -> )*x
+    */
+
+    expr=expr.replace(
+        /\)x/g,
+        ")*x"
+    );
+
+
+
+
+    /*
+       Math functions
+    */
 
     expr=expr.replace(
         /sin/g,
@@ -962,186 +787,65 @@ function transform(input){
     );
 
 
+
     return expr;
 
 }
+    /* =========================
+   GRAPH ENGINE
+========================= */
+
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+
+
+let graphs=[];
+
+let graphID=0;
+
+
+
+/* Camera */
+
+let scale=50;
+
+let originX=0;
+
+let originY=0;
 
 
 
 
 
+/* Resize */
+
+
+function resizeCanvas(){
+
+
+    canvas.width=
+    canvas.clientWidth;
+
+
+    canvas.height=
+    canvas.clientHeight;
 
 
 
-/* Add Graph */
+    if(originX===0){
 
+        originX=
+        canvas.width/2;
 
-function addGraph(){
-
-
-    let input=
-    document.getElementById("input").value;
-
-
-    if(!input)
-        return;
-
-
-
-    let expr=transform(input);
-
-
-    let f;
-
-
-    try{
-
-        f=new Function(
-            "x",
-            "return "+expr
-        );
-
-
-        f(1);
+        originY=
+        canvas.height/2;
 
     }
-
-    catch{
-
-        alert("Invalid equation");
-
-        return;
-
-    }
-
-
-
-
-
-    graphs.push({
-
-        id:graphID,
-
-        input,
-
-        f,
-
-        color:
-        `hsl(${Math.random()*360},70%,50%)`
-
-    });
-
-
-
-
-
-    let concept=getConcept(input);
-
-
-
-    let div=document.createElement("div");
-
-    div.className="graphItem";
-
-    div.id="graph"+graphID;
-
-
-
-    div.innerHTML=`
-
-    <b>
-    #${graphID}
-    </b>
-
-    ${input}
-
-
-    <br>
-
-    <small>
-    ${concept.title}
-    </small>
-
-
-    <br><br>
-
-
-    <button onclick="toggleConcept(${graphID})">
-
-    What is this graph?
-
-    </button>
-
-
-
-    <div 
-    id="concept${graphID}"
-    class="conceptBox"
-    style="display:none">
-
-
-    <b>
-    This graph is the graph of ${input}.
-    </b>
-
-
-    <br><br>
-
-
-    <b>Shape:</b>
-
-    <br>
-
-    ${concept.shape}
-
-
-    <br><br>
-
-
-    <b>Properties:</b>
-
-    <br>
-
-    ${
-        concept.properties
-        .map(
-            x=>"• "+x
-        )
-        .join("<br>")
-    }
-
-
-    <br><br>
-
-
-    <b>Concept:</b>
-
-    <br>
-
-    ${concept.category}
-
-
-    </div>
-
-
-
-    <button onclick="removeGraph(${graphID})">
-
-    ❌
-
-    </button>
-
-    `;
-
-
-
-    document
-    .getElementById("list")
-    .appendChild(div);
-
-
-
-    graphID++;
 
 
     draw();
@@ -1149,66 +853,18 @@ function addGraph(){
 }
 
 
-
-
-
-
-
-function toggleConcept(id){
-
-    let box=
-    document.getElementById(
-        "concept"+id
-    );
-
-
-    if(box.style.display==="none")
-
-        box.style.display="block";
-
-    else
-
-        box.style.display="none";
-
-}
+window.addEventListener(
+"resize",
+resizeCanvas
+);
 
 
 
 
 
 
-function removeGraph(id){
+/* Coordinate Convert */
 
-
-    graphs=
-    graphs.filter(
-        g=>g.id!==id
-    );
-
-
-    let box=
-    document.getElementById(
-        "graph"+id
-    );
-
-
-    if(box)
-        box.remove();
-
-
-    draw();
-
-}
-
-
-
-
-
-
-
-
-
-/* Coordinate */
 
 function worldX(px){
 
@@ -1232,88 +888,424 @@ function worldY(py){
 
 
 
+/* =========================
+   ADD GRAPH
+========================= */
+
+
+function addGraph(){
+
+
+    let input=
+    document.getElementById("input")
+    .value;
+
+
+    if(!input)
+        return;
+
+
+
+    let expr=
+    transform(input);
+
+
+
+    let func;
+
+
+    try{
+
+
+        func=new Function(
+            "x",
+            "return "+expr
+        );
+
+
+        let test=
+        func(1);
+
+
+
+        if(typeof test!=="number")
+            throw Error();
+
+
+    }
+
+    catch{
+
+        alert(
+        "Invalid equation"
+        );
+
+        return;
+
+    }
+
+
+
+
+
+    let id=graphID;
+
+
+
+    graphs.push({
+
+        id:id,
+
+        input:input,
+
+        f:func,
+
+        color:
+        `hsl(${id*70%360},70%,50%)`
+
+    });
+
+
+
+
+
+    createGraphItem(
+        id,
+        input
+    );
+
+
+
+    graphID++;
+
+
+    document.getElementById("input")
+    .value="";
+
+
+    draw();
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   GRAPH LIST UI
+========================= */
+
+
+function createGraphItem(
+id,
+input
+){
+
+
+let concept=
+getConcept(input);
+
+
+
+let div=
+document.createElement("div");
+
+
+div.className="graphItem";
+
+div.id=
+"graph"+id;
+
+
+
+div.innerHTML=`
+
+<b>
+#${id}
+</b>
+
+${input}
+
+<br>
+
+<small>
+${concept.title}
+</small>
+
+
+<br><br>
+
+
+<button onclick="toggleConcept(${id})">
+
+Explain
+
+</button>
+
+
+<button onclick="removeGraph(${id})">
+
+❌
+
+</button>
+
+
+
+<div
+class="conceptBox"
+id="concept${id}"
+style="display:none">
+
+<b>
+${concept.title}
+</b>
+
+
+<br><br>
+
+
+<b>
+Shape:
+</b>
+
+<br>
+
+${concept.shape}
+
+
+
+<br><br>
+
+
+<b>
+Properties:
+</b>
+
+
+<br>
+
+
+${
+concept.properties
+.map(
+p=>"• "+p
+)
+.join("<br>")
+}
+
+
+
+<br><br>
+
+
+<b>
+Category:
+</b>
+
+<br>
+
+${concept.category}
+
+
+</div>
+
+
+`;
+
+
+
+document
+.getElementById("list")
+.appendChild(div);
+
+
+}
+
+
+
+
+
+function toggleConcept(id){
+
+
+let box=
+document.getElementById(
+"concept"+id
+);
+
+
+
+box.style.display=
+box.style.display==="none"
+?
+"block"
+:
+"none";
+
+
+}
+
+
+
+
+
+
+function removeGraph(id){
+
+
+graphs=
+graphs.filter(
+g=>g.id!==id
+);
+
+
+
+let item=
+document.getElementById(
+"graph"+id
+);
+
+
+if(item)
+item.remove();
+
+
+
+draw();
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   AXIS
+========================= */
+
+
+function drawAxis(){
+
+
+ctx.strokeStyle="#bbb";
+
+ctx.lineWidth=1;
 
 
 
 /* Axis */
 
 
-function drawAxis(){
+ctx.beginPath();
 
 
-    ctx.strokeStyle="#aaa";
-
-    ctx.lineWidth=1;
-
-
-
-    ctx.beginPath();
+ctx.moveTo(
+0,
+originY
+);
 
 
-    ctx.moveTo(
-        0,
-        originY
-    );
+ctx.lineTo(
+canvas.width,
+originY
+);
 
 
-    ctx.lineTo(
-        canvas.width,
-        originY
-    );
+
+ctx.moveTo(
+originX,
+0
+);
 
 
-    ctx.moveTo(
-        originX,
-        0
-    );
+ctx.lineTo(
+originX,
+canvas.height
+);
 
 
-    ctx.lineTo(
-        originX,
-        canvas.height
-    );
-
-
-    ctx.stroke();
+ctx.stroke();
 
 
 
 
 
-    ctx.fillStyle="#333";
 
-    ctx.font="12px Arial";
-
+/* Grid numbers */
 
 
-    for(let i=-20;i<=20;i++){
+ctx.fillStyle="#555";
+
+ctx.font="12px Arial";
 
 
-        ctx.fillText(
 
-            i,
-
-            originX+i*scale,
-
-            originY+15
-
-        );
+let step=1;
 
 
-        if(i!==0)
 
-        ctx.fillText(
-
-            i,
-
-            originX+5,
-
-            originY-i*scale
-
-        );
+if(scale<30)
+step=5;
 
 
-    }
+if(scale>120)
+step=0.5;
+
+
+
+
+for(
+let i=-100;
+i<=100;
+i+=step
+){
+
+
+let px=
+originX+i*scale;
+
+
+let py=
+originY-i*scale;
+
+
+
+if(
+px>0 &&
+px<canvas.width
+)
+
+ctx.fillText(
+Number(i.toFixed(2)),
+px,
+originY+15
+);
+
+
+
+if(
+py>0 &&
+py<canvas.height
+)
+
+ctx.fillText(
+Number(i.toFixed(2)),
+originX+5,
+py
+);
+
+
+
+}
+
+
 
 }
 
@@ -1323,100 +1315,135 @@ function drawAxis(){
 
 
 
-
-
-/* Draw Graph */
+/* =========================
+   DRAW GRAPHS
+========================= */
 
 
 function drawGraphs(){
 
 
-    graphs.forEach(g=>{
+
+graphs.forEach(g=>{
 
 
-        ctx.strokeStyle=g.color;
-
-        ctx.lineWidth=2;
-
-
-        ctx.beginPath();
+ctx.strokeStyle=
+g.color;
 
 
-        let started=false;
+ctx.lineWidth=2;
+
+
+ctx.beginPath();
 
 
 
-        for(
-            let px=0;
-            px<canvas.width;
-            px+=2
-        ){
+let started=false;
 
-
-            let x=worldX(px);
-
-            let y;
-
-
-            try{
-
-                y=g.f(x);
-
-            }
-
-            catch{
-
-                started=false;
-
-                continue;
-
-            }
+let lastY=null;
 
 
 
 
-            if(
-                !Number.isFinite(y)
-                ||
-                Math.abs(y)>10000
-            ){
-
-                started=false;
-
-                continue;
-
-            }
+for(
+let px=0;
+px<canvas.width;
+px+=2
+){
 
 
+let x=
+worldX(px);
 
-            let py=
-            originY-y*scale;
+
+let y;
 
 
 
-            if(!started){
+try{
 
-                ctx.moveTo(px,py);
+y=g.f(x);
 
-                started=true;
+}
 
-            }
+catch{
 
-            else{
+started=false;
 
-                ctx.lineTo(px,py);
+continue;
 
-            }
-
-
-        }
+}
 
 
-        ctx.stroke();
 
 
-    });
+if(
+!Number.isFinite(y)
+||
+Math.abs(y)>10000
+){
 
+started=false;
+
+continue;
+
+}
+
+
+
+
+/*
+  Prevent wrong connections
+*/
+
+if(
+lastY!==null &&
+Math.abs(y-lastY)>50
+){
+
+started=false;
+
+}
+
+
+
+let py=
+originY-y*scale;
+
+
+
+if(!started){
+
+ctx.moveTo(
+px,
+py
+);
+
+started=true;
+
+}
+
+else{
+
+ctx.lineTo(
+px,
+py
+);
+
+}
+
+
+
+lastY=y;
+
+
+}
+
+
+ctx.stroke();
+
+
+});
 
 }
 
@@ -1425,39 +1452,38 @@ function drawGraphs(){
 
 
 
-
+/* =========================
+   MAIN DRAW
+========================= */
 
 
 function draw(){
 
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
 
 
-    drawAxis();
+drawAxis();
 
-    drawGraphs();
+drawGraphs();
+
 
 }
-
-
-
-
-
-
-
-
-
-/* Drag */
+/* =========================
+   DRAG MOVE
+========================= */
 
 
 let dragging=false;
 
-let lastX,lastY;
+let lastX=0;
+
+let lastY=0;
 
 
 
@@ -1465,13 +1491,18 @@ canvas.addEventListener(
 "mousedown",
 e=>{
 
-    dragging=true;
 
-    lastX=e.clientX;
+dragging=true;
 
-    lastY=e.clientY;
+
+lastX=e.clientX;
+
+lastY=e.clientY;
+
+
 
 });
+
 
 
 
@@ -1479,9 +1510,12 @@ window.addEventListener(
 "mouseup",
 ()=>{
 
-    dragging=false;
+
+dragging=false;
+
 
 });
+
 
 
 
@@ -1490,27 +1524,27 @@ window.addEventListener(
 e=>{
 
 
-    if(!dragging)
-        return;
+if(!dragging)
+return;
 
 
 
-    originX+=
-    e.clientX-lastX;
+originX+=
+e.clientX-lastX;
 
 
-    originY+=
-    e.clientY-lastY;
-
-
-
-    lastX=e.clientX;
-
-    lastY=e.clientY;
+originY+=
+e.clientY-lastY;
 
 
 
-    draw();
+lastX=e.clientX;
+
+lastY=e.clientY;
+
+
+
+draw();
 
 
 });
@@ -1521,9 +1555,9 @@ e=>{
 
 
 
-
-
-/* Zoom */
+/* =========================
+   ZOOM
+========================= */
 
 
 canvas.addEventListener(
@@ -1531,59 +1565,81 @@ canvas.addEventListener(
 e=>{
 
 
-    e.preventDefault();
+e.preventDefault();
 
 
 
-    let oldScale=scale;
+let oldScale=
+scale;
 
 
 
-    if(e.deltaY<0)
+if(e.deltaY<0)
 
-        scale*=1.1;
-
-    else
-
-        scale/=1.1;
+scale*=1.1;
 
 
+else
 
-    scale=Math.max(
-        10,
-        Math.min(
-            scale,
-            300
-        )
-    );
+scale/=1.1;
 
 
 
-    let mx=e.offsetX;
 
-    let my=e.offsetY;
-
-
-
-    originX =
-    mx-(mx-originX)
-    *(scale/oldScale);
-
-
-
-    originY =
-    my-(my-originY)
-    *(scale/oldScale);
+scale=Math.max(
+10,
+Math.min(
+300,
+scale
+)
+);
 
 
 
-    draw();
+
+/*
+ Keep mouse position
+ */
+
+
+let mx=
+e.offsetX;
+
+
+let my=
+e.offsetY;
+
+
+
+
+originX=
+mx-
+(mx-originX)
+*
+(scale/oldScale);
+
+
+
+
+originY=
+my-
+(my-originY)
+*
+(scale/oldScale);
+
+
+
+
+draw();
+
 
 
 },
 {
-    passive:false
-});
+passive:false
+}
+
+);
 
 
 
@@ -1593,7 +1649,9 @@ e=>{
 
 
 
-/* Click Info */
+/* =========================
+   CLICK VALUE CHECK
+========================= */
 
 
 canvas.addEventListener(
@@ -1601,45 +1659,76 @@ canvas.addEventListener(
 e=>{
 
 
-    let x=worldX(e.offsetX);
+let x=
+worldX(e.offsetX);
 
 
 
-    let text=
-    "x = "
-    +x.toFixed(3)
-    +"\n\n";
+let text=
+"x = "
++
+x.toFixed(3)
++
+"\n\n";
 
 
 
-    graphs.forEach(g=>{
 
 
-        let y=g.f(x);
+graphs.forEach(g=>{
 
 
-
-        text+=
-        g.input
-        +
-        "\n";
-
-
-        text+=
-        "y = "
-        +
-        y.toFixed(4)
-        +
-        "\n\n";
-
-
-    });
+let y;
 
 
 
-    document.getElementById(
-        "info"
-    ).innerText=text;
+try{
+
+y=g.f(x);
+
+}
+
+catch{
+
+return;
+
+}
+
+
+
+
+if(
+Number.isFinite(y)
+){
+
+
+text+=
+g.input
++
+"\n";
+
+
+text+=
+"y = "
++
+y.toFixed(4)
++
+"\n\n";
+
+
+}
+
+
+});
+
+
+
+
+
+document
+.getElementById("info")
+.innerText=text;
+
 
 
 });
@@ -1649,7 +1738,42 @@ e=>{
 
 
 
+
+
+
+/* =========================
+   ENTER KEY
+========================= */
+
+
+document
+.getElementById("input")
+.addEventListener(
+"keydown",
+e=>{
+
+
+if(e.key==="Enter"){
+
+addGraph();
+
+}
+
+
+});
+
+
+
+
+
+
+
+
+
+/* START */
+
 resizeCanvas();
+    </script>
 
-
-</script>
+</body>
+</html>
