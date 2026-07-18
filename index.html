@@ -1,235 +1,129 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Universal Graph Engine</title>
-
+<title>Ultra Graph</title>
 <style>
-body{
-    margin:0;
-    font-family:sans-serif;
-}
+body { margin:0; font-family:sans-serif; }
+#container { display:flex; height:100vh; }
 
-#container{
-    display:flex;
-    min-height:100vh;
-}
+#left { width:70%; display:flex; flex-direction:column; }
+#topbar { background:#222; color:white; padding:10px; }
+#canvasWrap { flex:1; }
+canvas { width:100%; height:100%; background:white; }
 
-#left{
-    width:70%;
-    display:flex;
-    flex-direction:column;
-}
+#info { height:120px; overflow:auto; background:#111; color:#0f0; padding:10px; }
+#list { height:150px; overflow:auto; border-top:1px solid #ccc; }
 
-#topbar{
-    padding:10px;
-    background:#222;
-    color:white;
-}
-
-#canvasWrap{
-    flex:1;
-    min-height:0;
-}
-
-canvas{
-    width:100%;
-    height:100%;
-    display:block;
-    background:#000;
-}
-
-#list{
-    height:140px;
-    overflow:auto;
-    border-top:1px solid #444;
-    background:#111;
-    color:#0f0;
-    font-size:13px;
-}
-
-.graphItem{
-    padding:5px;
-    border-bottom:1px solid #333;
-}
-
-#right{
-    width:30%;
-    background:#f4f4f4;
-    padding:15px;
-    overflow:auto;
-}
+#right { width:30%; padding:15px; background:#f4f4f4; overflow:auto; }
 </style>
 </head>
-
 <body>
 
 <div id="container">
 
 <div id="left">
-    <div id="topbar">
-        <input id="input" placeholder="식 입력 (예: x=tan(y), y=sin(x), x^2+y^2=1)">
-        <button onclick="addGraph()">추가</button>
-    </div>
+<div id="topbar">
+<input id="expr" placeholder="y=sin(x)/sin(x^2)">
+<button onclick="draw()">Draw</button>
+</div>
 
-    <div id="canvasWrap">
-        <canvas id="c"></canvas>
-    </div>
+<div id="canvasWrap">
+<canvas id="cv"></canvas>
+</div>
 
-    <div id="list"></div>
+<div id="info" id="log"></div>
+<div id="list"></div>
 </div>
 
 <div id="right">
-<h3>Function Types</h3>
+<h3>Functions Guide</h3>
+<p><b>Supported:</b></p>
+<ul>
+<li>y = f(x)</li>
+<li>x = f(y)</li>
+<li>y = f(x,y)</li>
+</ul>
 
-<b>Explicit</b><br>
-y = f(x)<br><br>
+<p><b>Examples:</b></p>
+<ul>
+<li>y=sin(x)/sin(x^2)</li>
+<li>x=tan(y)</li>
+<li>y=tan(x*y)</li>
+</ul>
 
-<b>Implicit</b><br>
-F(x,y) = 0<br><br>
-
-<b>Parametric</b><br>
-x=f(t), y=g(t)<br><br>
-
-<b>Polar</b><br>
-r=f(θ)<br><br>
-
-<hr>
-
-<b>Policy:</b><br>
-Everything will be drawn.<br>
-Except meaningless or complex-only equations.
+<p><b>Note:</b><br>
+Very complex equations may be inaccurate.</p>
 </div>
 
 </div>
 
 <script>
+const cv = document.getElementById("cv");
+const ctx = cv.getContext("2d");
 
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-
-let W,H;
 function resize(){
-    W = canvas.clientWidth;
-    H = canvas.clientHeight;
-    canvas.width = W;
-    canvas.height = H;
+  cv.width = cv.clientWidth;
+  cv.height = cv.clientHeight;
 }
 window.onresize = resize;
 resize();
 
-let graphs = [];
-let scale = 40;
+function parse(expr){
+  expr = expr.replaceAll("^","**");
+  expr = expr.replace(/sin/g,"Math.sin");
+  expr = expr.replace(/cos/g,"Math.cos");
+  expr = expr.replace(/tan/g,"Math.tan");
+  expr = expr.replace(/e/g,"Math.E");
 
-function fix(expr){
-    return expr
-        .replace(/\^/g,"**")
-        .replace(/tan/g,"Math.tan")
-        .replace(/sin/g,"Math.sin")
-        .replace(/cos/g,"Math.cos")
-        .replace(/log/g,"Math.log")
-        .replace(/([xy])([xy])/g,"$1*$2")
-        .replace(/([0-9])([xy])/g,"$1*$2");
-}
-
-function parse(input){
-
-    if(!input.includes("=")) return null;
-
-    let [L,R] = input.split("=");
-
-    L = fix(L);
-    R = fix(R);
-
+  if(expr.includes("=")){
+    let [L,R] = expr.split("=");
     return `${L} - (${R})`;
-}
-
-function addGraph(){
-    let raw = document.getElementById("input").value;
-
-    if(!raw.trim()) return;
-
-    let expr = parse(raw);
-    if(!expr){
-        alert("Invalid");
-        return;
-    }
-
-    let f;
-    try{
-        f = new Function("x","y","return " + expr);
-    }catch(e){
-        alert("Invalid");
-        return;
-    }
-
-    graphs.push({
-        raw,
-        f
-    });
-
-    updateList();
-}
-
-function updateList(){
-    let list = document.getElementById("list");
-    list.innerHTML = "";
-
-    graphs.forEach((g,i)=>{
-        let d = document.createElement("div");
-        d.className="graphItem";
-        d.textContent = `[${i}] ${g.raw}`;
-        list.appendChild(d);
-    });
+  }
+  return expr;
 }
 
 function draw(){
+  let input = document.getElementById("expr").value;
+  let expr = parse(input);
 
-    ctx.fillStyle="#000";
-    ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,cv.width,cv.height);
 
-    // 좌표축
-    ctx.strokeStyle="#555";
-    ctx.beginPath();
-    ctx.moveTo(0,H/2);
-    ctx.lineTo(W,H/2);
-    ctx.moveTo(W/2,0);
-    ctx.lineTo(W/2,H);
-    ctx.stroke();
+  let scale = 40;
+  let threshold = 0.05;
 
-    graphs.forEach((g,gi)=>{
+  for(let px=0; px<cv.width; px++){
+    for(let py=0; py<cv.height; py++){
 
-        ctx.fillStyle = `hsl(${gi*60},100%,50%)`;
+      let x = (px - cv.width/2)/scale;
+      let y = (cv.height/2 - py)/scale;
 
-        for(let px=0; px<W; px++){
-            for(let py=0; py<H; py++){
+      let val;
+      try{
+        val = eval(expr);
+      }catch{
+        continue;
+      }
 
-                let x = (px - W/2)/scale;
-                let y = (H/2 - py)/scale;
+      if(!isFinite(val)) continue;
 
-                let v;
+      if(Math.abs(val) < threshold){
+        ctx.fillRect(px,py,1,1);
+      }
+    }
+  }
 
-                try{
-                    v = g.f(x,y);
-                }catch{
-                    continue;
-                }
+  log("Drawn: " + input);
 
-                if(!isFinite(v)) continue;
-                if(Math.abs(v) > 100) continue;
-
-                if(Math.abs(v) < 0.05){
-                    ctx.fillRect(px,py,1,1);
-                }
-            }
-        }
-    });
-
-    requestAnimationFrame(draw);
+  if(input.length > 30){
+    log("⚠ Equation may be too complex → inaccurate");
+  }
 }
 
-draw();
-
+function log(msg){
+  let box = document.getElementById("info");
+  box.innerHTML += msg + "<br>";
+}
 </script>
 
 </body>
