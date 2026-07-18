@@ -2,145 +2,238 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Advanced Graph Calculator</title>
+<title>Ultimate Graph Calculator</title>
 
 <style>
-body { font-family: sans-serif; }
+body { margin:0; font-family:sans-serif; }
 
-#top { display:flex; }
-#left { width:70%; }
-#right { width:30%; padding:10px; background:#f5f5f5; }
+#container { display:flex; height:100vh; }
 
-canvas { border:1px solid black; cursor:crosshair; }
+#left {
+    width:70%;
+    display:flex;
+    flex-direction:column;
+}
 
-.graphItem {
-    background:#eee;
-    margin:5px;
-    padding:5px;
+#topbar {
+    padding:10px;
+    background:#222;
+    color:white;
+}
+
+#topbar input {
+    width:200px;
+}
+
+#canvasWrap {
+    flex:1;
+}
+
+canvas {
+    width:100%;
+    height:100%;
+    border-top:1px solid #000;
+    cursor:crosshair;
 }
 
 #info {
-    margin-top:10px;
-    padding:10px;
+    height:120px;
+    overflow:auto;
     background:#111;
     color:#0f0;
-    min-height:100px;
-    white-space:pre-line;
+    padding:10px;
+    font-size:14px;
+}
+
+#list {
+    height:150px;
+    overflow:auto;
+    border-top:1px solid #ccc;
+}
+
+.graphItem {
+    padding:5px;
+    border-bottom:1px solid #ddd;
+}
+
+#right {
+    width:30%;
+    overflow:auto;
+    background:#f4f4f4;
+    padding:15px;
 }
 </style>
 </head>
 <body>
 
-<div id="top">
+<div id="container">
 
 <div id="left">
-<h2>📈 Advanced Graph Calculator</h2>
 
-<input id="input" placeholder="y=2x+1">
+<div id="topbar">
+📈 Ultimate Graph Calculator  
+<input id="input" placeholder="y=sin(x)+x^2">
 <button onclick="addGraph()">Add</button>
+</div>
 
-<canvas id="canvas" width="800" height="500"></canvas>
+<div id="canvasWrap">
+<canvas id="canvas" width="900" height="600"></canvas>
+</div>
 
-<div id="info">👉 Click anywhere on graph</div>
+<div id="info">👉 Click graph to see detailed values</div>
 
-<h3>📊 Graph List</h3>
 <div id="list"></div>
+
 </div>
 
 <div id="right">
 
-<h3>📘 Usage</h3>
+<h2>📘 Usage Guide</h2>
 <pre>
-Use ^ for power
-xx = x^2
-xxx = x^3
+[Input Rules]
+Use:
+x^2 → power
+xx → x²
+xxx → x³
 
-Functions:
-sin cos tan log sqrt abs
+Auto-multiplication:
+2x → 2*x
 
-Examples:
-y=2x+1
-y=xx
-y=1/x
-y=sin(x)
+-------------------------
+
+[Functions]
+
+sin(x) → wave (periodic)
+cos(x) → shifted wave
+tan(x) → repeating with gaps
+
+log(x) → ln(x), x>0
+sqrt(x) → √x
+abs(x) → |x|
+
+Constant:
+e = 2.718...
+
+-------------------------
+
+[Examples]
+
+y=2x+1 → line
+y=xx → parabola
+y=1/x → hyperbola
+y=sin(x) → wave
+
+-------------------------
+
+[Tips]
+
+Combine freely:
+y = sin(x)+x^2
+
+Invalid domain:
+log(x), sqrt(x)
+
+Graph disappears?
+→ value too large or undefined
 </pre>
 
-<h3>📚 Graph Info</h3>
+<h2>📚 Graph Theory</h2>
 <pre>
-Linear → straight line
-Quadratic → parabola
-Inverse → hyperbola
-Trig → wave functions
+[Linear]
+y=ax+b
+→ straight line
+→ slope a
+→ intercept b
+
+[Proportional]
+y=ax
+→ passes (0,0)
+
+[Quadratic]
+y=ax²
+→ parabola
+→ has vertex
+
+[Cubic]
+y=ax³
+→ S-shape
+
+[Inverse]
+y=1/x
+→ hyperbola
+→ asymptotes
+
+[Trigonometric]
+
+sin(x)
+→ smooth wave
+→ range [-1,1]
+
+cos(x)
+→ starts at 1
+
+tan(x)
+→ infinite jumps
+
+[Log]
+y=log(x)
+→ x>0 only
+
+[Sqrt]
+y=√x
+→ starts (0,0)
+
+[Absolute]
+y=|x|
+→ V shape
 </pre>
 
 </div>
 </div>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
 
 let graphs=[];
 let id=0;
 
-let scale=40;
+let scale=50;
 let originX=canvas.width/2;
 let originY=canvas.height/2;
 
 function transform(input){
     return input
-        .replace("y=","")
-        .replace(/\s/g,"")
-        .replace(/x{2,}/g,m=>m.split("").join("*"))
-        .replace(/\^/g,"**")
-        .replace(/(\d)x/g,"$1*x")
-        .replace(/x(\d)/g,"x*$1")
-        .replace(/sin/g,"Math.sin")
-        .replace(/cos/g,"Math.cos")
-        .replace(/tan/g,"Math.tan")
-        .replace(/log/g,"Math.log")
-        .replace(/sqrt/g,"Math.sqrt")
-        .replace(/abs/g,"Math.abs")
-        .replace(/e/g,"Math.E");
+    .replace("y=","")
+    .replace(/\s/g,"")
+    .replace(/x{2,}/g,m=>m.split("").join("*"))
+    .replace(/\^/g,"**")
+    .replace(/(\d)x/g,"$1*x")
+    .replace(/x(\d)/g,"x*$1")
+    .replace(/sin/g,"Math.sin")
+    .replace(/cos/g,"Math.cos")
+    .replace(/tan/g,"Math.tan")
+    .replace(/log/g,"Math.log")
+    .replace(/sqrt/g,"Math.sqrt")
+    .replace(/abs/g,"Math.abs")
+    .replace(/e/g,"Math.E");
 }
 
 function getDesc(input){
     let t=input.toLowerCase();
 
-    if(t.includes("sin"))
-        return "Sine Function\n- Periodic wave\n- Range: [-1,1]\n- Period: 2π";
+    if(t.includes("sin")) return "Sine → periodic wave";
+    if(t.includes("cos")) return "Cosine → shifted wave";
+    if(t.includes("tan")) return "Tangent → asymptotes";
+    if(t.includes("1/x")) return "Inverse → hyperbola";
+    if(t.includes("log")) return "Log → x>0";
+    if(t.includes("sqrt")) return "Sqrt → x≥0";
+    if(t.includes("abs")) return "Absolute → V shape";
+    if(t.match(/xx/)) return "Quadratic → parabola";
+    if(t.match(/xxx/)) return "Cubic → S curve";
+    if(t.match(/x/)) return "Linear or polynomial";
 
-    if(t.includes("cos"))
-        return "Cosine Function\n- Shifted sine\n- Range: [-1,1]\n- Starts at 1";
-
-    if(t.includes("tan"))
-        return "Tangent Function\n- Vertical asymptotes\n- Period: π";
-
-    if(t.includes("1/x"))
-        return "Inverse Function\n- Hyperbola\n- Asymptotes: x=0, y=0";
-
-    if(t.includes("log"))
-        return "Log Function\n- Domain: x>0\n- Passes (1,0)";
-
-    if(t.includes("sqrt"))
-        return "Square Root\n- Domain: x≥0\n- Starts at (0,0)";
-
-    if(t.includes("abs"))
-        return "Absolute Value\n- V shape\n- Vertex (0,0)";
-
-    if(t.match(/x\^?2|xx/))
-        return "Quadratic\n- Parabola\n- Symmetry";
-
-    if(t.match(/x\^?3|xxx/))
-        return "Cubic\n- S shape\n- Inflection";
-
-    if(t.match(/y=\d*x$/))
-        return "Linear (Proportional)\n- Passes origin";
-
-    if(t.match(/y=\d*x\+\d+/))
-        return "Linear\n- Has intercept";
-
-    return "General Function";
+    return "Function";
 }
 
 function addGraph(){
@@ -154,7 +247,7 @@ function addGraph(){
         f=new Function("x","return "+expr);
         f(1);
     }catch{
-        alert("Invalid expression");
+        alert("Invalid");
         return;
     }
 
@@ -168,8 +261,8 @@ function addGraph(){
 
     div.innerHTML=`
     <b>#${id}</b> ${input}
-    <pre>${getDesc(input)}</pre>
-    <button onclick="removeGraph(${id})">Remove</button>
+    <br>${getDesc(input)}
+    <button onclick="removeGraph(${id})">❌</button>
     `;
 
     document.getElementById("list").appendChild(div);
@@ -185,16 +278,14 @@ function removeGraph(i){
 function drawAxis(){
     ctx.strokeStyle="#000";
 
-    // X
     ctx.beginPath();
-    ctx.moveTo(0, originY);
-    ctx.lineTo(canvas.width, originY);
+    ctx.moveTo(0,originY);
+    ctx.lineTo(canvas.width,originY);
     ctx.stroke();
 
-    // Y
     ctx.beginPath();
-    ctx.moveTo(originX, 0);
-    ctx.lineTo(originX, canvas.height);
+    ctx.moveTo(originX,0);
+    ctx.lineTo(originX,canvas.height);
     ctx.stroke();
 
     ctx.fillStyle="#000";
@@ -203,11 +294,8 @@ function drawAxis(){
         let x=originX+i*scale;
         let y=originY+i*scale;
 
-        ctx.fillRect(x, originY-3,1,6);
-        ctx.fillText(i, x-5, originY+15);
-
-        ctx.fillRect(originX-3, y,6,1);
-        if(i!==0) ctx.fillText(-i, originX+5, y+3);
+        ctx.fillText(i,x-5,originY+15);
+        if(i!==0) ctx.fillText(-i,originX+5,y+3);
     }
 }
 
@@ -262,16 +350,15 @@ canvas.addEventListener("click", e=>{
     let py=e.clientY-rect.top;
 
     let x=(px-originX)/scale;
-    let y=(originY-py)/scale;
 
-    let text=`Clicked:\n(x=${x.toFixed(3)}, y=${y.toFixed(3)})\n\n`;
+    let text=`Clicked x = ${x.toFixed(3)}\n\n`;
 
     graphs.forEach(g=>{
         try{
             let val=g.f(x);
 
             text+=`[Graph #${g.id}] ${g.input}\n`;
-            text+=`f(x) = ${val.toFixed(4)}\n`;
+            text+=`y = ${val.toFixed(4)}\n`;
             text+=`${getDesc(g.input)}\n\n`;
 
         }catch{}
