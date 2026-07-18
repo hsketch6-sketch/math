@@ -1,79 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Ultimate Graph Calculator</title>
+<title>Universal Graph Engine</title>
 
 <style>
-body {
+body{
     margin:0;
     font-family:sans-serif;
 }
 
-#container {
+#container{
     display:flex;
     min-height:100vh;
 }
 
-#left {
+#left{
     width:70%;
     display:flex;
     flex-direction:column;
-    overflow:hidden;
 }
 
-#topbar {
+#topbar{
     padding:10px;
     background:#222;
     color:white;
 }
 
-#topbar input {
-    width:200px;
-}
-
-#canvasWrap {
+#canvasWrap{
     flex:1;
     min-height:0;
 }
 
-canvas {
+canvas{
     width:100%;
     height:100%;
-    border-top:1px solid #000;
-    cursor:crosshair;
+    display:block;
+    background:#000;
 }
 
-#info {
-    height:120px;
+#list{
+    height:140px;
     overflow:auto;
+    border-top:1px solid #444;
     background:#111;
     color:#0f0;
-    padding:10px;
-    font-size:14px;
-    flex-shrink:0;
+    font-size:13px;
 }
 
-#list {
-    height:150px;
-    overflow:auto;
-    border-top:1px solid #ccc;
-    flex-shrink:0;
-}
-
-.graphItem {
+.graphItem{
     padding:5px;
-    border-bottom:1px solid #ddd;
+    border-bottom:1px solid #333;
 }
 
-#right {
+#right{
     width:30%;
-    overflow:auto;
     background:#f4f4f4;
     padding:15px;
+    overflow:auto;
 }
 </style>
-
 </head>
 
 <body>
@@ -81,155 +67,169 @@ canvas {
 <div id="container">
 
 <div id="left">
+    <div id="topbar">
+        <input id="input" placeholder="식 입력 (예: x=tan(y), y=sin(x), x^2+y^2=1)">
+        <button onclick="addGraph()">추가</button>
+    </div>
 
-<div id="topbar">
-📈 Ultimate Graph Calculator  
-<input id="input" placeholder="y=sin(x)+x^2">
-<button onclick="addGraph()">Add</button>
-</div>
+    <div id="canvasWrap">
+        <canvas id="c"></canvas>
+    </div>
 
-<div id="canvasWrap">
-<canvas id="canvas" width="900" height="600"></canvas>
-</div>
-
-<div id="info">👉 Click graph to see values</div>
-
-<div id="list"></div>
-
+    <div id="list"></div>
 </div>
 
 <div id="right">
-<h2>📘 Usage</h2>
-<pre>
-y=2x+1
-y=xx
-y=sin(x)
-</pre>
+<h3>Function Types</h3>
+
+<b>Explicit</b><br>
+y = f(x)<br><br>
+
+<b>Implicit</b><br>
+F(x,y) = 0<br><br>
+
+<b>Parametric</b><br>
+x=f(t), y=g(t)<br><br>
+
+<b>Polar</b><br>
+r=f(θ)<br><br>
+
+<hr>
+
+<b>Policy:</b><br>
+Everything will be drawn.<br>
+Except meaningless or complex-only equations.
 </div>
 
 </div>
 
 <script>
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
 
-let graphs=[];
-let id=0;
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
 
-let scale=50;
-let originX=canvas.width/2;
-let originY=canvas.height/2;
+let W,H;
+function resize(){
+    W = canvas.clientWidth;
+    H = canvas.clientHeight;
+    canvas.width = W;
+    canvas.height = H;
+}
+window.onresize = resize;
+resize();
 
-function transform(input){
-    return input
-    .replace("y=","")
-    .replace(/\s/g,"")
-    .replace(/x{2,}/g,m=>m.split("").join("*"))
-    .replace(/\^/g,"**")
-    .replace(/(\d)x/g,"$1*x")
-    .replace(/x(\d)/g,"x*$1")
-    .replace(/sin/g,"Math.sin")
-    .replace(/cos/g,"Math.cos")
-    .replace(/tan/g,"Math.tan")
-    .replace(/log/g,"Math.log")
-    .replace(/sqrt/g,"Math.sqrt")
-    .replace(/abs/g,"Math.abs")
-    .replace(/e/g,"Math.E");
+let graphs = [];
+let scale = 40;
+
+function fix(expr){
+    return expr
+        .replace(/\^/g,"**")
+        .replace(/tan/g,"Math.tan")
+        .replace(/sin/g,"Math.sin")
+        .replace(/cos/g,"Math.cos")
+        .replace(/log/g,"Math.log")
+        .replace(/([xy])([xy])/g,"$1*$2")
+        .replace(/([0-9])([xy])/g,"$1*$2");
+}
+
+function parse(input){
+
+    if(!input.includes("=")) return null;
+
+    let [L,R] = input.split("=");
+
+    L = fix(L);
+    R = fix(R);
+
+    return `${L} - (${R})`;
 }
 
 function addGraph(){
-    let input=document.getElementById("input").value;
-    if(!input) return;
+    let raw = document.getElementById("input").value;
 
-    let expr=transform(input);
+    if(!raw.trim()) return;
 
-    let f;
-    try{
-        f=new Function("x","return "+expr);
-        f(1);
-    }catch{
+    let expr = parse(raw);
+    if(!expr){
         alert("Invalid");
         return;
     }
 
-    let color=`hsl(${Math.random()*360},70%,50%)`;
+    let f;
+    try{
+        f = new Function("x","y","return " + expr);
+    }catch(e){
+        alert("Invalid");
+        return;
+    }
 
-    graphs.push({id,f,input,color});
+    graphs.push({
+        raw,
+        f
+    });
 
-    let div=document.createElement("div");
-    div.className="graphItem";
-    div.id="g"+id;
-
-    div.innerHTML=`
-    <b>#${id}</b> ${input}
-    <button onclick="removeGraph(${id})">❌</button>
-    `;
-
-    document.getElementById("list").appendChild(div);
-
-    id++;
+    updateList();
 }
 
-function removeGraph(i){
-    graphs=graphs.filter(g=>g.id!==i);
-    document.getElementById("g"+i).remove();
-}
+function updateList(){
+    let list = document.getElementById("list");
+    list.innerHTML = "";
 
-function drawAxis(){
-    ctx.beginPath();
-    ctx.moveTo(0,originY);
-    ctx.lineTo(canvas.width,originY);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(originX,0);
-    ctx.lineTo(originX,canvas.height);
-    ctx.stroke();
-}
-
-function drawGraphs(){
-    graphs.forEach(g=>{
-        ctx.strokeStyle=g.color;
-        ctx.beginPath();
-
-        let prev=false;
-
-        for(let i=0;i<canvas.width;i++){
-            let x=(i-originX)/scale;
-            let y;
-
-            try{y=g.f(x);}catch{prev=false;continue;}
-
-            if(!isFinite(y)||Math.abs(y)>1000){
-                prev=false;
-                continue;
-            }
-
-            let py=originY-y*scale;
-
-            if(!prev){
-                ctx.moveTo(i,py);
-                prev=true;
-            }else{
-                ctx.lineTo(i,py);
-            }
-        }
-
-        ctx.stroke();
+    graphs.forEach((g,i)=>{
+        let d = document.createElement("div");
+        d.className="graphItem";
+        d.textContent = `[${i}] ${g.raw}`;
+        list.appendChild(d);
     });
 }
 
 function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    drawAxis();
-    drawGraphs();
+
+    ctx.fillStyle="#000";
+    ctx.fillRect(0,0,W,H);
+
+    // 좌표축
+    ctx.strokeStyle="#555";
+    ctx.beginPath();
+    ctx.moveTo(0,H/2);
+    ctx.lineTo(W,H/2);
+    ctx.moveTo(W/2,0);
+    ctx.lineTo(W/2,H);
+    ctx.stroke();
+
+    graphs.forEach((g,gi)=>{
+
+        ctx.fillStyle = `hsl(${gi*60},100%,50%)`;
+
+        for(let px=0; px<W; px++){
+            for(let py=0; py<H; py++){
+
+                let x = (px - W/2)/scale;
+                let y = (H/2 - py)/scale;
+
+                let v;
+
+                try{
+                    v = g.f(x,y);
+                }catch{
+                    continue;
+                }
+
+                if(!isFinite(v)) continue;
+                if(Math.abs(v) > 100) continue;
+
+                if(Math.abs(v) < 0.05){
+                    ctx.fillRect(px,py,1,1);
+                }
+            }
+        }
+    });
+
+    requestAnimationFrame(draw);
 }
 
-function loop(){
-    draw();
-    requestAnimationFrame(loop);
-}
-loop();
+draw();
+
 </script>
 
 </body>
