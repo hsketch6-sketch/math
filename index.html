@@ -1142,7 +1142,39 @@ py
 
 
 ctx.stroke();
+ctx.stroke();
 
+/* ⭐ 3점 찍기 */
+let minX = worldX(0);
+let maxX = worldX(canvas.width);
+
+let xs = [minX, 0, maxX];
+
+xs.forEach(x=>{
+  let y;
+
+  try{
+    y = g.f(x);
+  }catch{
+    return;
+  }
+
+  if(!Number.isFinite(y)) return;
+
+  let px = originX + x * scale;
+  let py = originY - y * scale;
+
+  ctx.fillStyle = g.color;
+
+  // 원점 강조
+  if(x === 0){
+    ctx.fillStyle = "red";
+  }
+
+  ctx.beginPath();
+  ctx.arc(px, py, 5, 0, Math.PI*2);
+  ctx.fill();
+});
 
 });
 
