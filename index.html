@@ -1142,13 +1142,9 @@ py
 
 
 ctx.stroke();
-ctx.stroke();
 
-/* ⭐ 3점 찍기 */
-let minX = worldX(0);
-let maxX = worldX(canvas.width);
-
-let xs = [minX, 0, maxX];
+/* ⭐ x = -1, 0, 1 점 찍기 */
+let xs = [-1, 0, 1];
 
 xs.forEach(x=>{
   let y;
@@ -1164,22 +1160,21 @@ xs.forEach(x=>{
   let px = originX + x * scale;
   let py = originY - y * scale;
 
+  // 색 설정
   ctx.fillStyle = g.color;
 
   // 원점 강조
-  if(x === 0){
+  if(Math.abs(x) < 0.0001){
     ctx.fillStyle = "red";
   }
 
   ctx.beginPath();
   ctx.arc(px, py, 5, 0, Math.PI*2);
   ctx.fill();
+
+  // 좌표 표시
+  ctx.fillText(`(${x}, ${y.toFixed(2)})`, px+6, py-6);
 });
-
-});
-
-
-}
 
 
 
